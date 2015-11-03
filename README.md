@@ -1,2 +1,2 @@
-# DPM
-code for DPM labs
+# JUST DO IT!!!
+no seriously
