@@ -2,7 +2,7 @@ package Project;
 
 import lejos.hardware.sensor.EV3ColorSensor;
 
-public class ColorSensorPoller {
+public class ColorSensorPoller extends Thread{
 
 	private SampleProvider colorValue;
 	private float[] colorData;
