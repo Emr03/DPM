@@ -35,6 +35,19 @@ public class Localization  extends Thread{
 	}
 	
 	
+	public void run(){
+		
+		double angleA, angleB;
+		double deltaTheta;
+		
+		
+		
+		
+		
+		
+	}
+	
+	
 	
 	
 	
