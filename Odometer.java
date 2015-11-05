@@ -1,14 +1,11 @@
 package Project;
 
-import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 public class Odometer extends Thread {
 
 	// robot position
 	private double x, y, theta;
 	private double distL, distR, deltaD, deltaT, dx, dy;
-	private double Wl, Wr, Wb; // basic parameters of the robot (wheel radii and
-								// wheel base)
 	private int nowTachoL, nowTachoR, lastTachoL, lastTachoR;
 	
 
@@ -34,17 +31,12 @@ public class Odometer extends Thread {
 		lastTachoL = 0;
 		lastTachoR = 0;
 
-		// Set robot's data to corresponding basic parameters of the robot.
-		Wl = Robot.left_radius;
-		Wr = Robot.right_radius;
-		Wb = Robot.wheel_base;
-
 		// Assign lock.
 		lock = new Object();
 
 	}
 
-	// run method (required for Thread)
+
 	public void run() {
 
 		long updateStart, updateEnd;
@@ -58,8 +50,8 @@ public class Odometer extends Thread {
 			nowTachoR = Robot.rightMotor.getTachoCount();
 
 			// Calculate the distance traveled by each wheel.
-			distL = Math.PI * Wl * (nowTachoL - lastTachoL) / 180;
-			distR = Math.PI * Wr * (nowTachoR - lastTachoR) / 180;
+			distL = Math.PI * Robot.left_radius * (nowTachoL - lastTachoL) / 180;
+			distR = Math.PI * Robot.right_radius * (nowTachoR - lastTachoR) / 180;
 
 			// Replace the last tacho values by current tacho values (for the
 			// next turn).
@@ -67,7 +59,7 @@ public class Odometer extends Thread {
 			lastTachoR = nowTachoR;
 
 			deltaD = (distL + distR) / 2;
-			deltaT = (distR - distL) / Wb;
+			deltaT = (distR - distL) / Robot.wheel_base;
 
 			synchronized (lock) {
 
