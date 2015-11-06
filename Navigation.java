@@ -23,15 +23,11 @@ public class Navigation {
 	 */
 	public void run(){
 		isNavigating = true;
-
 		try {
 			travelTo(waypoint[0], waypoint[1]); 	
 		} catch (InterruptedException e) {
+			Robot.avoider.avoid(); 
 			isNavigating = false;
-			// there is nothing to be done here because it is not
-			// expected that the odometer will be interrupted by
-			// another thread
-
 		 }
 	}
 
@@ -76,7 +72,7 @@ public class Navigation {
 	 * @param deltaY
 	 * @return 
 	 */
-	private double getArcTan(double deltaX, double deltaY) {
+	private double getArcTan(double deltaX, double deltaY) throws InterruptedException{
 		double T;
 		if ((int) deltaX == 0)
 			T = ((int) deltaY >= 0) ? Math.PI / 2 : -Math.PI / 2;
@@ -91,21 +87,11 @@ public class Navigation {
 	}
 
 	/**
-	 * called by other classes, stops the motors when done
-	 * @param theta
-	 */
-	public void turnTo(double theta) {
-		adjustHeading(theta); 
-		stopMotors();
-	}
-
-	
-	/**
 	 * called by travelTo to adjust the heading
 	 * does not stop motors when done (smoother)
 	 * @param theta
 	 */
-	private void adjustHeading(double theta) {
+	private void adjustHeading(double theta) throws InterruptedException{
 		currentT = Robot.odometer.getTheta(); // get current heading
 		deltaT = theta - currentT;
 
@@ -137,7 +123,7 @@ public class Navigation {
 		Robot.leftMotor.endSynchronization();
 	}
 
-	private double getMinAngle(double deltaT) {
+	private double getMinAngle(double deltaT) throws InterruptedException {
 		// set minimal theta
 		if (deltaT > 0) {
 			if (Math.abs(deltaT) > Math.abs(deltaT - 2 * Math.PI))

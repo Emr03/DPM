@@ -48,6 +48,13 @@ public class Robot {
 		while (state != State.FINISHED) {
 
 		}
-
+		
+		//Notes: while in the navigate state, main checks distance from ultrasonic poller and interrupts navigation thread which calls avoid() 
+		//sets state to AVOID (since avoid() is not a thread, it has an internal check on whether the coast is clear, if it is it returns true to main, and navigation resumes
+		//to avoid as much complications as possible, we should think of main as the mediator between all the threads
+			
+		//Questions: 
+		//what happens after interrupt code is executed? does the thread resume, or should we recall navigator.run() from main?
+		//should avoid() be called from main? and have a flag isInterrupted for Navigator?
 	}
 }
