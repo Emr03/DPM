@@ -1,11 +1,10 @@
 
 package Project;
 
+import lejos.hardware.Sound;
 import lejos.hardware.lcd.TextLCD;
 import lejos.robotics.SampleProvider;
-import localization.Navigation;
-import localization.Odometer;
-import localization.USLocalizer.LocalizationType;
+
 
 public static double ROTATION_SPEED = 30;
 
@@ -43,6 +42,8 @@ public class Localization  extends Thread{
 	
 	
 	/**
+	 * @param
+	 *
 	 * 
 	 */
 	
@@ -52,6 +53,47 @@ public class Localization  extends Thread{
 		double deltaTheta;
 		
 		
+		// rotate the robot until it sees wall then stop
+		navigate.turn(false);
+		while(getFilteredData()>d-k);
+		navigate.halt();
+		
+		
+		//keep rotating till the wall disappears, then store the angle
+		navigate.turn(false);
+		while(getFilteredData()<d+k);
+		navigate.halt();
+		angleA=odo.getAng();
+		t.drawString("angleA=" +angleA, 0, 5);
+		Sound.twoBeeps();
+		
+		
+		//switch directions and look for a wall
+		navigate.turn(true);
+		while(getFilteredData()>d-k);
+		navigate.halt();
+		
+		
+		//rotate clockwise till the wall disappears then store the angle
+		navigate.turn(true);
+		while(getFilteredData()<d+k);
+		navigate.halt();
+		angleB=odo.getAng();
+		t.drawString("angleB=" +angleB, 0, 5);
+		Sound.twoBeeps();
+		
+	
+		if (angleA > angleB) {
+			deltaTheta = 225 - (angleA + angleB)/2;
+		} else {
+			deltaTheta = 45 - (angleA + angleB)/2;
+			}
+		t.drawString("deltaTheta=" +deltaTheta, 0, 5);
+		
+		odo.setPosition(new double [] {0.0, 0.0, (odo.getAng()+deltaTheta)}, new boolean [] {false, false, true});
+		navigate.turnTo(0.0,false);
+		Sound.beep();
+		
 		
 		
 		
@@ -59,7 +101,21 @@ public class Localization  extends Thread{
 	}
 	
 	
+	/**
+	 * 
+	 */
 	
+private float getFilteredData(UltrasonicPoller usPoller) {
+		
+		int distance = usPoller.getDistance();
+		
+		if (distance> 30){
+			distance=maxDist;
+		}
+	
+					
+		return distance;
+	}
 	
 	
 	
