@@ -1,3 +1,4 @@
+
 package Project;
 
 import lejos.hardware.lcd.TextLCD;
@@ -22,6 +23,12 @@ private final int d = 30;
 private final int k = 7;
 private final int width = 15;
 
+/**
+ * 
+ * @author Alina Mambo
+ *
+ */
+
 
 public class Localization  extends Thread{
 	
@@ -34,6 +41,10 @@ public class Localization  extends Thread{
 		this.usPoller_right=usPoller_right;
 	}
 	
+	
+	/**
+	 * 
+	 */
 	
 	public void run(){
 		
