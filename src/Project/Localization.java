@@ -2,25 +2,10 @@
 package Project;
 
 import lejos.hardware.Sound;
-import lejos.hardware.lcd.TextLCD;
 import lejos.robotics.SampleProvider;
 
 
-public static double ROTATION_SPEED = 30;
 
-private Odometer odo;
-private SampleProvider usSensor;
-private float[] usData;
-private int corner;
-private Navigation navigate;
-private UltrasonicPoller usPoller_left;
-private UltrasonicPoller usPoller_right;
-
-
-private final int maxDist = 50;
-private final int d = 30;
-private final int k = 7;
-private final int width = 15;
 
 /**
  * 
@@ -29,9 +14,24 @@ private final int width = 15;
  */
 
 
-public class Localization  extends Thread{
+public class Localization{
+	public static double ROTATION_SPEED = 30;
+
+	private Odometer odo;
+	private SampleProvider usSensor;
+	private float[] usData;
+	private int corner;
+	private Navigation navigate;
+	private UltrasonicPoller usPoller_left;
+	private UltrasonicPoller usPoller_right;
+
+
+	private final int maxDist = 50;
+	private final int d = 30;
+	private final int k = 7;
+	private final int width = 15;
 	
-	public USLocalizer(Odometer odo,Navigation navigate, UltrasonicPoller usPoller_left, UltrasonicPoller usPoller_right) {
+	public Localization(Odometer odo,Navigation navigate, UltrasonicPoller usPoller_left, UltrasonicPoller usPoller_right) {
 		this.odo = odo;
 		this.usSensor = usSensor;
 		this.usData = usData;
@@ -47,7 +47,7 @@ public class Localization  extends Thread{
 	 * 
 	 */
 	
-	public void run(){
+	public void Localization(){
 		
 		double angleA, angleB;
 		double deltaTheta;
