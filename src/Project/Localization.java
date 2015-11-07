@@ -1,6 +1,8 @@
 
 package Project;
 
+import Project.Odometer;
+import Project.UltrasonicPoller;
 import lejos.hardware.Sound;
 import lejos.robotics.SampleProvider;
 
@@ -8,9 +10,14 @@ import lejos.robotics.SampleProvider;
 
 
 /**
+ * Localization CLass
  * 
- * @author Alina Mambo
- *
+ * This class is called to localize the robot on a grid.
+ * 
+ * 
+ * @author DPM TEAM18
+ * @version 1.0, 7 Nov 2015
+ * 
  */
 
 
@@ -18,10 +25,7 @@ public class Localization{
 	public static double ROTATION_SPEED = 30;
 
 	private Odometer odo;
-	private SampleProvider usSensor;
-	private float[] usData;
 	private int corner;
-	private Navigation navigate;
 	private UltrasonicPoller usPoller_left;
 	private UltrasonicPoller usPoller_right;
 
@@ -31,18 +35,24 @@ public class Localization{
 	private final int k = 7;
 	private final int width = 15;
 	
-	public Localization(Odometer odo,Navigation navigate, UltrasonicPoller usPoller_left, UltrasonicPoller usPoller_right) {
+	/**
+	 * Creates an Object of type Localization
+	 * @param odo Odometer
+	 * @param usPoller_left UltrasonicPoller
+	 * @param usPoller_right UltrasonicPoller
+	 * @param corner int
+	 */
+	
+	public Localization(Odometer odo, UltrasonicPoller usPoller_left, UltrasonicPoller usPoller_right, int corner) {
 		this.odo = odo;
-		this.usSensor = usSensor;
-		this.usData = usData;
-		this.navigate=navigate;
+		this.corner=corner;
 		this.usPoller_left=usPoller_left;
 		this.usPoller_right=usPoller_right;
 	}
 	
 	
 	/**
-	 * @param
+	 * Localizes the Robot using Rising edge method
 	 *
 	 * 
 	 */
@@ -75,12 +85,10 @@ public class Localization{
 		
 		
 		//rotate clockwise till the wall disappears then store the angle
-		navigate.turn(true);
+		turn(true);
 		while(getFilteredData()<d+k);
 		navigate.halt();
 		angleB=odo.getAng();
-		t.drawString("angleB=" +angleB, 0, 5);
-		Sound.twoBeeps();
 		
 	
 		if (angleA > angleB) {
@@ -88,24 +96,21 @@ public class Localization{
 		} else {
 			deltaTheta = 45 - (angleA + angleB)/2;
 			}
-		t.drawString("deltaTheta=" +deltaTheta, 0, 5);
 		
 		odo.setPosition(new double [] {0.0, 0.0, (odo.getAng()+deltaTheta)}, new boolean [] {false, false, true});
 		navigate.turnTo(0.0,false);
-		Sound.beep();
-		
-		
-		
 		
 		
 	}
 	
 	
+
 	/**
-	 * 
+	 * This method returns filtered data on the distances recored by the US Poller Class.
+	 * @param usPoller UltrasonicPoller
+	 * @return distance int
 	 */
-	
-private float getFilteredData(UltrasonicPoller usPoller) {
+	private int getFilteredData(UltrasonicPoller usPoller) {
 		
 		int distance = usPoller.getDistance();
 		
