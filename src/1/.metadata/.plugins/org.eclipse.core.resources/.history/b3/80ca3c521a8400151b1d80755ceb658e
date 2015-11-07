@@ -1,0 +1,10 @@
+package Project;
+
+public class ObstacleAvoidance {
+
+	public void avoid() {
+		// TODO Auto-generated method stub
+		
+	}
+
+}

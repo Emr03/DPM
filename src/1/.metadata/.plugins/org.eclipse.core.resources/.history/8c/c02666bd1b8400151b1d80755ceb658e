@@ -1,0 +1,17 @@
+package Project;
+
+public class ObstacleAvoidance {
+	private final int bandCenter, bandwidth;
+	private final int motorStraight = 275, FILTER_OUT = 20;
+	
+    private int[] distance = new int[3]; 
+	
+	private int filterControl = 40; //used to wait after detecting a gap 
+	private final int gain = 7;  
+	
+	public void avoid() {
+		
+		
+	}
+
+}

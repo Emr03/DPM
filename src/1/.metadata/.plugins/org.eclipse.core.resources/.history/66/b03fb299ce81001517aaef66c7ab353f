@@ -1,0 +1,28 @@
+package Project;
+
+import lejos.hardware.ev3.LocalEV3;
+import lejos.hardware.motor.EV3LargeRegulatedMotor;
+import lejos.hardware.motor.EV3MediumRegulatedMotor;
+import lejos.hardware.port.SensorPort;
+import lejos.hardware.sensor.EV3ColorSensor;
+import lejos.hardware.sensor.EV3UltrasonicSensor;
+
+public class Robot {
+
+	public static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
+	public static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
+	public static final EV3MediumRegulatedMotor armMotor = new EV3MediumRegulatedMotor(LocalEV3.get().getPort("C"));
+	public static final EV3UltrasonicSensor usSensor = new EV3UltrasonicSensor(SensorPort.S3);
+	public static final EV3ColorSensor colorSensor = new EV3ColorSensor(SensorPort.S1);
+
+	public static final UltrasonicPoller usPoller = new UltrasonicPoller(usSensor.getDistanceMode()); 
+	public static final ColorSensorPoller colorPoller = new ColorSensorPoller(colorSensor); 
+    public static final Odometer odometer = new Odometer ()
+	private enum State {
+	LOCALIZE, NAVIGATE, AVOID, CAPTURE 	
+	}
+	
+	
+	private static State state = State.LOCALIZE; 
+	
+}

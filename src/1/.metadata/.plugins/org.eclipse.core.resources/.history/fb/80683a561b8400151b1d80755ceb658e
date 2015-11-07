@@ -1,0 +1,16 @@
+package Project;
+
+public class ObstacleAvoidance {
+	private final int bandCenter, bandwidth;
+	private final int motorStraight = 275, FILTER_OUT = 20;
+	private EV3LargeRegulatedMotor leftMotor, rightMotor;
+	private int distance;
+	private int filterControl;
+	private final int gain = 7;  
+	
+	public void avoid() {
+		
+		
+	}
+
+}
