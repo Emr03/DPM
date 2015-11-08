@@ -4,7 +4,8 @@ package project;
 
 /**
  * 
- * @author Shia LaBlock
+ * @author DPM TEAM18
+ *@version 1.0, 7 Nov 2015
  * provides methods for controlling the robot's motion
  */
 
