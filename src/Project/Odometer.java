@@ -2,7 +2,9 @@ package project;
 
 /**
  * 
- * @author Shia LaBlock implements simple odometry using the motor's tachometers
+ * @author DPM TEAM18
+ * @version 1.0, 7 Nov 2015
+ * implements simple odometry using the motor's tachometers
  */
 class Odometer extends Thread {
 
