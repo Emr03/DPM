@@ -5,7 +5,8 @@ package project;
 
 /**
  * 
- * @author Shia LaBlock 
+ * @author DPM TEAM18
+ *@version 1.0, 7 Nov 2015
  * Path planning class with obstacle avoidance capability
  */
 class PathPlanner {
