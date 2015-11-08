@@ -1,4 +1,4 @@
-package Project;
+package project;
 
 import java.io.IOException;
 import java.net.MalformedURLException;

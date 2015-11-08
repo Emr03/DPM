@@ -1,4 +1,4 @@
-package Project;
+package project;
 
 /**
  * Flag Capture CLass

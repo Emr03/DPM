@@ -1,4 +1,4 @@
-package Project;
+package project;
 
 import lejos.robotics.SampleProvider;
 

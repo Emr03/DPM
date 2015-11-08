@@ -1,4 +1,4 @@
-package Project;
+package project;
 
 import lejos.hardware.sensor.EV3ColorSensor;
 import lejos.robotics.SampleProvider;
