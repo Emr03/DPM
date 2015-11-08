@@ -1,42 +1,53 @@
-package Project;
+package project;
 
+/**
+ * 
+ * @author Shia LaBlock implements simple odometry using the motor's tachometers
+ */
+class Odometer extends Thread {
 
-public class Odometer extends Thread {
+	private static double x = 0, y = 0, theta = Math.PI / 2;
 
-	// robot position
-	private double x, y, theta;
-	private double distL, distR, deltaD, deltaT, dx, dy;
-	private int nowTachoL, nowTachoR, lastTachoL, lastTachoR;
+	/**
+	 * distance covered by left wheel in cm 
+	 */
+	private static double distL;
+
+	/**
+	 * distance covered by right wheel in cm 
+	 */
+	private static double distR;
 	
+	/**
+	 * displacement of center of rotation in cm 
+	 */
+	private static double deltaD;
+	
+	/**
+	 * change in heading in radians
+	 */
+	private static double deltaT;
+	
+	/**
+	 * displacement in x-direction in cm 
+	 */
+	private static double dx;
+	
+	/**
+	 * displacement in y-direction in cm 
+	 */
+	private static double dy;
+	
+	private static int nowTachoL, nowTachoR, lastTachoL = 0, lastTachoR = 0;
 
-	// odometer update period, in ms
 	private static final long ODOMETER_PERIOD = 20;
 
-	// lock object for mutual exclusion
-	private Object lock;
+	/** lock object for synchronization **/
+	private Object lock = new Object();
 
-	// default constructor
-	public Odometer() {
-
-		// Initialize position, orientation, and variables for calculation.
-		x = 0.0;
-		y = 0.0;
-		theta = Math.PI / 2;
-		distL = 0;
-		distR = 0;
-		deltaD = 0;
-		deltaT = 0;
-		dx = 0;
-		dy = 0;
-		lastTachoL = 0;
-		lastTachoR = 0;
-
-		// Assign lock.
-		lock = new Object();
-
-	}
-
-
+	/**
+	 * updates the robot's position and heading using the motor's tachometers
+	 */
 	public void run() {
 
 		long updateStart, updateEnd;
@@ -98,30 +109,39 @@ public class Odometer extends Thread {
 
 	}
 
-	// accessors
+	/**
+	 * returns the coordinates in cm and the heading in radians
+	 * 
+	 * @param position
+	 *            array of type double that stores coordinates and heading
+	 */
 	public void getPosition(double[] position) {
 
 		// Ensure that the values don't change while the odometer is running
 		synchronized (lock) {
 			position[0] = x;
 			position[1] = y;
-			position[2] = Math.toDegrees(theta);
+			position[2] = theta;
 		}
 
 	}
 
+	/**
+	 * 
+	 * @return current x-coordinate in cm
+	 */
 	public double getX() {
-
 		double result;
-
 		synchronized (lock) {
 			result = x;
 		}
-
 		return result;
-
 	}
 
+	/**
+	 * 
+	 * @return current y-coordinate in cm
+	 */
 	public double getY() {
 
 		double result;
@@ -134,6 +154,10 @@ public class Odometer extends Thread {
 
 	}
 
+	/**
+	 * 
+	 * @return current heading in radians
+	 */
 	public double getTheta() {
 
 		double result;
@@ -146,7 +170,14 @@ public class Odometer extends Thread {
 
 	}
 
-	// mutators
+	/**
+	 * 
+	 * @param position
+	 *            array of type double that stores new coordinates and heading
+	 * @param update
+	 *            array of type boolean that indicates which values from
+	 *            position[] to update
+	 */
 	public void setPosition(double[] position, boolean[] update) {
 
 		// Ensure that the values don't change while the odometer is running
