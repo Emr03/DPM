@@ -4,7 +4,9 @@ import project.PathPlanner.HEADING;
 
 /**
  * 
- * @author Shia LaBlock implements odometry correction by detecting grid lines
+  * @author DPM TEAM18
+ *@version 1.0, 7 Nov 2015
+ * implements odometry correction by detecting grid lines
  */
 
 class OdometryCorrection extends Thread {
