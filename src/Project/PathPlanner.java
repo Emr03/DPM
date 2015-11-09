@@ -1,4 +1,4 @@
-package project;
+package Project;
 
 //not a thread because it is called by the main method, and it should not move on until the destination is reached 
 //it handles obstacle avoidance by itself. No interrupts needed
