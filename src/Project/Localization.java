@@ -8,6 +8,7 @@ import lejos.robotics.SampleProvider;
 
 
 
+
 /**
  * Localization CLass
  * 
@@ -21,14 +22,15 @@ import lejos.robotics.SampleProvider;
 
 
 public class Localization{
-	public static double ROTATION_SPEED = 30;
+	public static int ROTATION_SPEED = 30;
+	public enum LocalizationType { FACING_AWAY, FACING_WALL};
 
 	private Odometer odo;
 	private int corner;
 	private UltrasonicPoller usPoller_left;
 	private UltrasonicPoller usPoller_right;
 
-
+	private LocalizationType locType;
 	private final int maxDist = 50;
 	private final int d = 30;
 	private final int k = 7;
@@ -50,60 +52,82 @@ public class Localization{
 	}
 	
 	
+	
+	public void begin(){
+		
+		if(getFilteredData(usPoller_left)<d-k && getFilteredData(usPoller_right )< d-k){
+			locType=LocalizationType.FACING_WALL;
+			doLocalization();
+		}
+		else{
+			locType=LocalizationType.FACING_AWAY;
+			doLocalization();
+		}
+		
+	}
+	
+	
 	/**
 	 * Localizes the Robot using Rising edge method
 	 *
 	 * 
 	 */
 	
-	public void Localization(){
+	public void doLocalization(){
 		
-		if()
 		
+		if(locType==LocalizationType.FACING_WALL){
+			
+			double angleA, angleB;
+			
+			// rotate the robot until it sees no wall then stop and latch
+			//rising edge
+			turn(false);
+			while(getFilteredData(usPoller_left)<maxDist);
+			halt();	
+			angleA= Math.toDegrees(odo.getTheta());
+			Sound.twoBeeps();
+			
+	
+			// switch direction and wait until it sees no wall then stop and latch
+			//falling edge
+			turn(false);
+			while(getFilteredData(usPoller_left)> d-k);
+			halt();
+			angleB=Math.toDegrees(odo.getTheta());
+			Sound.twoBeeps();	
+			
+			
+			computeAngle(angleA, angleB);
+			
+		}
+		else{
 		double angleA, angleB;
-		double deltaTheta;
 		
 		
-		// rotate the robot until it sees wall then stop
-		navigate.turn(false);
-		while(getFilteredData()>d-k);
-		navigate.halt();
-		
-		
-		//keep rotating till the wall disappears, then store the angle
-		navigate.turn(false);
-		while(getFilteredData()<d+k);
-		navigate.halt();
-		angleA=odo.getAng();
-		t.drawString("angleA=" +angleA, 0, 5);
+		// rotate the robot until it sees wall then stop and latch angle
+		//Falling edge
+		turn(true);
+		while(getFilteredData(usPoller_right)>d-k);
+		halt();
+		angleA= Math.toDegrees(odo.getTheta());
 		Sound.twoBeeps();
 		
 		
-		//switch directions and look for a wall
-		navigate.turn(true);
-		while(getFilteredData()>d-k);
-		navigate.halt();
-		
-		
-		//rotate clockwise till the wall disappears then store the angle
+		//keep rotating till the wall disappears, then store the angle
+		//Rising edge
 		turn(true);
-		while(getFilteredData()<d+k);
-		navigate.halt();
-		angleB=odo.getAng();
+		while(getFilteredData(usPoller_right)<d+k);
+		halt();
+		angleB=Math.toDegrees(odo.getTheta());
+		Sound.twoBeeps();
 		
-	
-		if (angleA > angleB) {
-			deltaTheta = 225 - (angleA + angleB)/2;
-		} else {
-			deltaTheta = 45 - (angleA + angleB)/2;
-			}
 		
-		odo.setPosition(new double [] {0.0, 0.0, (odo.getAng()+deltaTheta)}, new boolean [] {false, false, true});
-		navigate.turnTo(0.0,false);
+		computeAngle(angleA, angleB);
 		
+		}	
 		
 	}
-	
 	
 
 	/**
@@ -123,8 +147,78 @@ public class Localization{
 		return distance;
 	}
 	
+	private void computeAngle(double angleA, double angleB){
+		
+		double deltaTheta=0;
+		switch(this.corner){
+		
+		//Corner 1
+		case 1:
+			deltaTheta=computeDeltaTheta(angleA,angleB);
+			break;
+			
+		//depends if started facing or away	
+		case 2:
+			
+		//Corner 3, same as 1 but minus 180
+		case 3:
+			deltaTheta=180-computeDeltaTheta(angleA,angleB);
+			break;
+			
+			
+		case 4:
+			
+		
+		
+		
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+		odo.setPosition(new double [] {0.0, 0.0, (Math.toDegrees(odo.getTheta())+deltaTheta)}, new boolean [] {false, false, true});
+//		navigate.turnTo(0.0,false);
+	}
 	
 	
+	private double computeDeltaTheta(double angleA, double angleB){
+		
+		double deltaTheta;
+		
+		if (angleA > angleB) {
+			deltaTheta = 225 - (angleA + angleB)/2;
+		} else {
+			deltaTheta = 45 - (angleA + angleB)/2;
+			}
+		
+		return deltaTheta;
+		
+	}
+	
+	// turns the robot in a circle until stopped
+	public void turn (boolean clockwise) {
+		
+		Robot.leftMotor.setSpeed(ROTATION_SPEED);
+		Robot.rightMotor.setSpeed(ROTATION_SPEED);
+			
+		if (clockwise) {	
+			Robot.leftMotor.forward();
+			Robot.rightMotor.backward();
+		} else {
+			Robot.leftMotor.backward();
+			Robot.rightMotor.forward();
+		}
+		
+	}
+	
+	public void halt(){
+		Robot.leftMotor.stop();
+		Robot.rightMotor.stop();
+	}
 	
 	
 	
