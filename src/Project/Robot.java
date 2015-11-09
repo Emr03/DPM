@@ -21,9 +21,10 @@ public class Robot {
 	public static final UltrasonicPoller usPoller_right = new UltrasonicPoller(usSensor_right.getDistanceMode());
 	public static final ColorSensorPoller colorPoller = new ColorSensorPoller(colorSensor);
 
-	public static final Localization localizer = new Localization();
+
 	public static final Odometer odometer = new Odometer();
 	public static final Navigation navigator = new Navigation();
+	public static final Localization localizer = new Localization();
 	public static final PathPlanner planner = new PathPlanner();
 	public static final OdometryCorrection odoCorrector = new OdometryCorrection(); 
 	
@@ -34,7 +35,7 @@ public class Robot {
 	public static final int ROTATE_SPEED = 80;           
 	public static final int FORWARD_SPEED = 150;
 
-	public static final double start_corner[][] = new double[1][1];
+	public static final int start_corner[] = new int [1];
 	public static final double MyHome_lowerLeft[][] = new double[1][1];
 	public static final double MyHome_upperRight[][] = new double[1][1];
 	public static final double OppHome_lowerLeft[][] = new double[1][1];

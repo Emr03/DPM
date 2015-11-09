@@ -3,7 +3,7 @@ package Project;
 import Project.Odometer;
 import Project.UltrasonicPoller;
 import lejos.hardware.Sound;
-import lejos.robotics.SampleProvider;
+
 
 
 
@@ -26,7 +26,7 @@ public class Localization{
 	public enum LocalizationType { FACING_AWAY, FACING_WALL};
 
 	private Odometer odo;
-	private int corner;
+	private int corner=0 ;
 	private UltrasonicPoller usPoller_left;
 	private UltrasonicPoller usPoller_right;
 
@@ -34,7 +34,6 @@ public class Localization{
 	private final int maxDist = 50;
 	private final int d = 30;
 	private final int k = 7;
-	private final int width = 15;
 	
 	/**
 	 * Creates an Object of type Localization
@@ -44,11 +43,11 @@ public class Localization{
 	 * @param corner int
 	 */
 	
-	public Localization(Odometer odo, UltrasonicPoller usPoller_left, UltrasonicPoller usPoller_right, int corner) {
-		this.odo = odo;
-		this.corner=corner;
-		this.usPoller_left=usPoller_left;
-		this.usPoller_right=usPoller_right;
+	public Localization() {
+		this.odo = Robot.odometer;
+		this.corner=Robot.start_corner[1];
+		this.usPoller_left=Robot.usPoller_left;
+		this.usPoller_right=Robot.usPoller_right;
 	}
 	
 	
@@ -150,38 +149,35 @@ public class Localization{
 	private void computeAngle(double angleA, double angleB){
 		
 		double deltaTheta=0;
+		deltaTheta=computeDeltaTheta(angleA,angleB);
 		switch(this.corner){
 		
 		//Corner 1
 		case 1:
-			deltaTheta=computeDeltaTheta(angleA,angleB);
+			odo.setPosition(new double [] {0.0, 0.0, (Math.toDegrees(odo.getTheta())+deltaTheta)}, new boolean [] {false, false, true});
 			break;
 			
 		//depends if started facing or away	
+		//-90
 		case 2:
-			
-		//Corner 3, same as 1 but minus 180
-		case 3:
-			deltaTheta=180-computeDeltaTheta(angleA,angleB);
+			odo.setPosition(new double [] {0.0, 0.0, ((Math.toDegrees(odo.getTheta())+deltaTheta)-90)}, new boolean [] {false, false, true});
 			break;
 			
 			
+		//Corner 3, same as 1 but minus 180
+		case 3:
+			odo.setPosition(new double [] {0.0, 0.0, ((Math.toDegrees(odo.getTheta())+deltaTheta)-180)}, new boolean [] {false, false, true});
+			break;
+			
+		//Corner 4 same as case 2 but minus 180
+		//+90
 		case 4:
 			
-		
-		
-		
+			odo.setPosition(new double [] {0.0, 0.0, ((Math.toDegrees(odo.getTheta())+deltaTheta)+90)}, new boolean [] {false, false, true});
+			break;
+				
 		}
-		
-		
-		
-		
-		
-		
-		
-		
-		odo.setPosition(new double [] {0.0, 0.0, (Math.toDegrees(odo.getTheta())+deltaTheta)}, new boolean [] {false, false, true});
-//		navigate.turnTo(0.0,false);
+		Robot.navigator.turnTo(0.0);
 	}
 	
 	
