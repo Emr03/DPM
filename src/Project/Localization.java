@@ -58,6 +58,8 @@ public class Localization{
 	
 	public void Localization(){
 		
+		if()
+		
 		double angleA, angleB;
 		double deltaTheta;
 		
