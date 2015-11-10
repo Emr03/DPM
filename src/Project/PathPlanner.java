@@ -56,9 +56,9 @@ class PathPlanner {
 	 */
 	void travel() {
 		//0 is for east tile, 1 for north tile, 2 for west tile, 3 for south tile 
+		int[] tile_values = new int[4];
 		
 		while (!isReached) {
-			if (dest_x - current_x > Robot.tile) {
 			
 			if (dest_x - current_x > tile/2)
 				tile_values[0]=2; 
