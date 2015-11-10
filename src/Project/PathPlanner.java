@@ -55,36 +55,20 @@ class PathPlanner {
 	 * path planning method which handles obstacle avoidance
 	 */
 	void travel() {
+		//0 is for east tile, 1 for north tile, 2 for west tile, 3 for south tile 
+		
 		while (!isReached) {
-			current_x = Robot.odometer.getX();
-			current_y = Robot.odometer.getY();
-
 			if (dest_x - current_x > Robot.tile) {
-				new_H = HEADING.EAST;
-			} else if (dest_x - current_x < Robot.tile)
-				new_H = HEADING.WEST;
-
-			else {
-				if (dest_y - current_y > Robot.tile) {
-					new_H = HEADING.NORTH;
-				} else if (dest_y - current_y < Robot.tile) {
-					new_H = HEADING.SOUTH;
-				} else
-					isReached = true;
-			}
-
-			changeHeading();
-
-			if (Robot.usPoller_left.getDistance() < 2 * Robot.tile
-					|| Robot.usPoller_right.getDistance() < 2 * Robot.tile) {
-				if (dest_y - current_y > Robot.tile) {
-					new_H = HEADING.NORTH;
-				}
-				// *** to be completed, rest of choose heading routine
-				// We might want to write the PathPlanner as a state machine
-			}
-
 			
+			if (dest_x - current_x > tile/2)
+				tile_values[0]=2; 
+			else if (dest_x - current_x < -tile/2)
+				tile_values[2]=2; 
+			else {
+				tile_values[0]=1; 
+				tile_values[2]=1; 
+			}
+				
 			// at this point, final heading is chosen
 			changeHeading();
 			double[] displacement = { 0, 0 };
