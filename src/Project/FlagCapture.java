@@ -34,13 +34,35 @@ public class FlagCapture {
 	 */
 	public void Search(){
 		
+		while(!isCaptured){
+			
+			
+			
+		}
+		
+		
+		
+		
+		
+		
+		
 	}
+	
+	
+	
+	
+	
 	
 	/**
 	 * This method captures the Flag once found
 	 * @return isCaptured Boolean that is true when Flag has been captured.
 	 */
 	public boolean captureFlag(){
+		
+		
+		
+		
+		
 		
 		return isCaptured;
 		
