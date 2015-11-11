@@ -15,6 +15,9 @@ public class FlagCapture {
 	
 	private float flagColor;
 	private boolean isCaptured;
+	private int maxDist=15;
+	private UltrasonicPoller usPoller_left;
+	private UltrasonicPoller usPoller_right;
 	
 	/**
 	 * Creates an Object of type FlagCapture
@@ -24,6 +27,8 @@ public class FlagCapture {
 	public FlagCapture(float flagColor){
 		this.flagColor=flagColor;
 		this.isCaptured=false;
+		this.usPoller_left=Robot.usPoller_left;
+		this.usPoller_right=Robot.usPoller_right;
 		
 	}
 	
@@ -35,6 +40,10 @@ public class FlagCapture {
 	public void Search(){
 		
 		while(!isCaptured){
+			if(getFilteredData(usPoller_left)<maxDist || getFilteredData(usPoller_right)<maxDist){
+				travelTo
+				
+			}
 			
 			
 			
@@ -69,6 +78,17 @@ public class FlagCapture {
 	}
 	
 	
+	private int getFilteredData(UltrasonicPoller usPoller) {
+		
+		int distance = usPoller.getDistance();
+		
+		if (distance> 30){
+			distance=maxDist;
+		}
+	
+					
+		return distance;
+	}
 	
 	
 	
