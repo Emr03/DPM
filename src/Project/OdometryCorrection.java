@@ -1,6 +1,6 @@
 package Project;
 
-import project.PathPlanner.HEADING;
+import Project.PathPlanner.HEADING;
 
 /**
  * 
@@ -45,22 +45,22 @@ class OdometryCorrection extends Thread {
 				switch (heading) {
 
 				case NORTH:
-					new_position = (2 * Math.floor((current_pos[1] - d) / 30.48) + 1) * 15.24;
+					new_position = (2 * Math.floor((current_pos[1]) / 30.48)) * 15.24;
 					Robot.odometer.setY(new_position);
 					break;
 
 				case EAST:
-					new_position = (2 * Math.floor((current_pos[0] - d) / 30.48) + 1) * 15.24;
+					new_position = (2 * Math.floor((current_pos[0]) / 30.48)) * 15.24;
 					Robot.odometer.setX(new_position);
 					break;
 
 				case SOUTH:
-					new_position = (2 * Math.floor((current_pos[1] + d) / 30.48) + 1) * 15.24;
+					new_position = (2 * Math.floor((current_pos[1]) / 30.48)) * 15.24;
 					Robot.odometer.setY(new_position);
 					break;
 
 				case WEST:
-					new_position = (2 * Math.floor((current_pos[0] + d) / 30.48) + 1) * 15.24;
+					new_position = (2 * Math.floor((current_pos[0]) / 30.48)) * 15.24;
 					Robot.odometer.setX(new_position);
 					break;
 				}
