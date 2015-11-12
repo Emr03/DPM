@@ -6,7 +6,7 @@ package Project;
 /**
  * 
  * @author DPM TEAM18
- * @version 1.0, 7 Nov 2015 Path planning class with obstacle avoidance
+ * @version 1.0, 10 Nov 2015 Path planning class with obstacle avoidance
  *          capability
  */
 class PathPlanner {
@@ -15,23 +15,23 @@ class PathPlanner {
 	/**
 	 * boolean flag to indicate whether destination is reached
 	 */
-	private static boolean isReached = false;
+	private boolean isReached = false;
 	/**
 	 * destination coordinate in cm
 	 */
-	private static double dest_x, dest_y;
+	private double dest_x, dest_y;
 	/**
 	 * current coordinate in cm
 	 */
-	private static double current_x, current_y;
+	private double current_x, current_y;
 	/**
 	 * current heading
 	 */
-	private static HEADING current_H;
+	private HEADING current_H;
 	/**
 	 * next heading
 	 */
-	private static HEADING new_H;
+	private HEADING new_H;
 
 	enum HEADING {
 	 EAST, NORTH, WEST, SOUTH
@@ -45,7 +45,7 @@ class PathPlanner {
 	 * @param y
 	 *            y coordinate in cm
 	 */
-	public static void setDestination(double x, double y) {
+	public  void setDestination(double x, double y) {
 		isReached = false;
 		dest_x = x;
 		dest_y = y;
@@ -171,7 +171,7 @@ class PathPlanner {
 	/**
 	 * Changes the robot's heading depending on planned path
 	 */
-	private static void changeHeading() {
+	private  void changeHeading() {
 		double theta;
 		switch (new_H) {
 		case NORTH:
