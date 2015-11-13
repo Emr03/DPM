@@ -35,7 +35,7 @@ public class Robot {
 	public static final int ROTATE_SPEED = 80;           
 	public static final int FORWARD_SPEED = 150;
 
-	public static final int start_corner[] = new int [1];
+	public static final int start_corner =1;
 	public static final double MyHome_lowerLeft[][] = new double[1][1];
 	public static final double MyHome_upperRight[][] = new double[1][1];
 	public static final double OppHome_lowerLeft[][] = new double[1][1];
@@ -51,9 +51,9 @@ public class Robot {
 		// get info from wifi class
 
 		// state machine loop
-		while (state != State.FINISHED) {
+			localizer.begin();
 
-		}
+		
 		
 		
 		//Notes: while in the navigate state, main checks distance from ultrasonic poller and interrupts navigation thread which calls avoid() 

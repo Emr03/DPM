@@ -45,7 +45,7 @@ public class Localization{
 	
 	public Localization() {
 		this.odo = Robot.odometer;
-		this.corner=Robot.start_corner[1];
+		this.corner=Robot.start_corner;
 		this.usPoller_left=Robot.usPoller_left;
 		this.usPoller_right=Robot.usPoller_right;
 	}
