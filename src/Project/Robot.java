@@ -11,7 +11,7 @@ public class Robot {
 
 	public static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
 	public static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
-	public static final EV3MediumRegulatedMotor armMotor = new EV3MediumRegulatedMotor(LocalEV3.get().getPort("C"));
+
 	public static final EV3UltrasonicSensor usSensor_left = new EV3UltrasonicSensor(SensorPort.S2);
 	public static final EV3UltrasonicSensor usSensor_right = new EV3UltrasonicSensor(SensorPort.S3);
 	public static final EV3ColorSensor colorSensor = new EV3ColorSensor(SensorPort.S1);
@@ -34,14 +34,12 @@ public class Robot {
 	public static final double tile = 30.48; 
 	public static final int ROTATE_SPEED = 80;           
 	public static final int FORWARD_SPEED = 150;
-	public static final int ARM_SPEED = 120; 
-	public static final in GRAB_SPEED = 80; 
 	
 	public static  int start_corner;
-	public static final double MyHome_lowerLeft[][] = new double[1][1];
-	public static final double MyHome_upperRight[][] = new double[1][1];
-	public static final double OppHome_lowerLeft[][] = new double[1][1];
-	public static final double OppHome_upperRight[][] = new double[1][1];
+	public static final int MyHome_lowerLeft[] = new int[2];
+	public static final int MyHome_upperRight[] = new int[2];
+	public static final int OppHome_lowerLeft[] = new int[2];
+	public static final int OppHome_upperRight[] = new int[2];
 
 	private enum State {
 		LOCALIZE, NAVIGATE, AVOID, CAPTURE, FINISHED
@@ -52,6 +50,7 @@ public class Robot {
 
 	void main() {
 		// get info from wifi class
+		//adjust coordinates from wifi class to point to middle of the tiles
 		start_corner = 1; 
 		
 		usPoller_left.start(); 
@@ -60,7 +59,8 @@ public class Robot {
 		odoCorrector.start(); 
 		
 		localizer.begin(); 
-		planner.setDestination(4, 8); 
+		
+		planner.setDestination(planner.getEntryPoints()); 
 		planner.travel(); 
 		
 	}
