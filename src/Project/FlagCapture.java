@@ -50,15 +50,48 @@ public class FlagCapture {
 	 */
 	public boolean Search(){
 		
+<<<<<<< HEAD
 		
 		return isCaptured;	
+=======
+		while(!isCaptured){
+			
+			
+			
+		}
+		
+		
+		
+		
+		
+		
+		
+>>>>>>> origin/master
 	}
+	
+	
+	
+	
+	
 	
 	/**
 	 * This method captures the Flag once found
 	 * @return isCaptured Boolean that is true when Flag has been captured.
 	 * @throws InterruptedException 
 	 */
+<<<<<<< HEAD
+=======
+	public boolean captureFlag(){
+		
+		
+		
+		
+		
+		
+		return isCaptured;
+		
+	}
+>>>>>>> origin/master
 	
 	
 	

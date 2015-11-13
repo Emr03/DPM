@@ -15,7 +15,7 @@ public class Robot {
 	public static final EV3UltrasonicSensor usSensor_left = new EV3UltrasonicSensor(SensorPort.S2);
 	public static final EV3UltrasonicSensor usSensor_right = new EV3UltrasonicSensor(SensorPort.S3);
 	public static final EV3ColorSensor colorSensor = new EV3ColorSensor(SensorPort.S1);
-	public static final EV3ColorSensor lightSensor = new EV3ColorSensor(SensorPort.S2); 
+	public static final EV3ColorSensor lightSensor = new EV3ColorSensor(SensorPort.S4); 
 
 	public static final UltrasonicPoller usPoller_left = new UltrasonicPoller(usSensor_left.getDistanceMode());
 	public static final UltrasonicPoller usPoller_right = new UltrasonicPoller(usSensor_right.getDistanceMode());

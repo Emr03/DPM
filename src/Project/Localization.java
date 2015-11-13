@@ -160,20 +160,20 @@ public class Localization{
 		//depends if started facing or away	
 		//-90
 		case 2:
-			odo.setPosition(new double [] {0.0, 0.0, ((Math.toDegrees(odo.getTheta())+deltaTheta)-90)}, new boolean [] {false, false, true});
+			odo.setPosition(new double [] {0.0, 0.0, ((Math.toDegrees(odo.getTheta())+deltaTheta)+90)}, new boolean [] {false, false, true});
 			break;
 			
 			
 		//Corner 3, same as 1 but minus 180
 		case 3:
-			odo.setPosition(new double [] {0.0, 0.0, ((Math.toDegrees(odo.getTheta())+deltaTheta)-180)}, new boolean [] {false, false, true});
+			odo.setPosition(new double [] {0.0, 0.0, ((Math.toDegrees(odo.getTheta())+deltaTheta)+180)}, new boolean [] {false, false, true});
 			break;
 			
 		//Corner 4 same as case 2 but minus 180
 		//+90
 		case 4:
 			
-			odo.setPosition(new double [] {0.0, 0.0, ((Math.toDegrees(odo.getTheta())+deltaTheta)+90)}, new boolean [] {false, false, true});
+			odo.setPosition(new double [] {0.0, 0.0, ((Math.toDegrees(odo.getTheta())+deltaTheta)-90)}, new boolean [] {false, false, true});
 			break;
 				
 		}
