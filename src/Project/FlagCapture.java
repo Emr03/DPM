@@ -41,7 +41,7 @@ public class FlagCapture {
 		
 		while(!isCaptured){
 			if(getFilteredData(usPoller_left)<maxDist || getFilteredData(usPoller_right)<maxDist){
-				travelTo
+//				navigator.travelTo
 				
 			}
 			
