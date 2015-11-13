@@ -47,7 +47,7 @@ public class Robot {
 	
 	private static State state = State.LOCALIZE;
 
-	void main() {
+	public static void main(String[] args) {
 		// get info from wifi class
 
 		// state machine loop
