@@ -40,6 +40,8 @@ public class Robot {
 	public static final double MyHome_upperRight[][] = new double[1][1];
 	public static final double OppHome_lowerLeft[][] = new double[1][1];
 	public static final double OppHome_upperRight[][] = new double[1][1];
+	public static final int Opp_Color= 0;
+	public static final int Home_Color=0;
 	
 	private enum State {
 		LOCALIZE, NAVIGATE, AVOID, CAPTURE, FINISHED

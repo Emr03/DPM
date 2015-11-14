@@ -88,7 +88,7 @@ public class Localization{
 			Sound.twoBeeps();
 			
 	
-			// switch direction and wait until it sees no wall then stop and latch
+			// keep the same direction and wait until it sees no wall then stop and latch
 			//falling edge
 			turn(false);
 			while(getFilteredData(usPoller_left)> d-k);

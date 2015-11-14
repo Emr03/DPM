@@ -54,7 +54,7 @@ class PathPlanner {
 	/**
 	 * path planning method which handles obstacle avoidance
 	 */
-	void travel() {
+	public void travel() {
 		//0 is for east tile, 1 for north tile, 2 for west tile, 3 for south tile  
 		// -1 -> obstacle, 0 -> previous tile, 1-> clear farther, 2 -> clear closer. 
 		int[] tile_values = {1, 1, 1, 1};
@@ -196,4 +196,6 @@ class PathPlanner {
 	public HEADING getHeading() {
 		return current_H;
 	}
+	
+	
 }
