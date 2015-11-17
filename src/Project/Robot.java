@@ -34,17 +34,7 @@ public class Robot {
 	public static final double tile = 30.48; 
 	public static final int ROTATE_SPEED = 80;           
 	public static final int FORWARD_SPEED = 150;
-<<<<<<< HEAD
-=======
 
-	public static final int start_corner =1;
-	public static final double MyHome_lowerLeft[][] = new double[1][1];
-	public static final double MyHome_upperRight[][] = new double[1][1];
-	public static final double OppHome_lowerLeft[][] = new double[1][1];
-	public static final double OppHome_upperRight[][] = new double[1][1];
-	public static final int Opp_Color= 0;
-	public static final int Home_Color=0;
->>>>>>> flagcapture-ver1
 	
 	public static  int start_corner;
 	public static final int MyHome_lowerLeft[] = new int[2];
@@ -61,7 +51,7 @@ public class Robot {
 
 	public static void main(String[] args) {
 		// get info from wifi class
-<<<<<<< HEAD
+
 		//adjust coordinates from wifi class to point to middle of the tiles
 		start_corner = 1; 
 		
@@ -69,19 +59,17 @@ public class Robot {
 		usPoller_right.start(); 
 		odometer.start(); 
 		odoCorrector.start(); 
-=======
+
 
 		// state machine loop
-			localizer.begin();
+		localizer.begin();
 
 		
->>>>>>> flagcapture-ver1
-		
-		localizer.begin(); 
 		
 		planner.setDestination(planner.getEntryPoints()); 
 		planner.travel(); 
-		
+	while (Button.waitForAnyPress()!= Button.ID_ESCAPE);
+		System.exit(0);
 	}
 	
 
