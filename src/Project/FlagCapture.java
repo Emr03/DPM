@@ -43,12 +43,11 @@ public class FlagCapture {
 	public FlagCapture(float flagColor){
 		this.flagColor=flagColor;
 		this.isCaptured=false;
-<<<<<<< HEAD
+
 		armMotor.setAcceleration(3000);
-=======
+
 		this.usPoller_left=Robot.usPoller_left;
 		this.usPoller_right=Robot.usPoller_right;
->>>>>>> flagcapture-ver1
 		
 	}
 	
@@ -57,25 +56,8 @@ public class FlagCapture {
 	 * This method searches for the Flag
 	 * 
 	 */
-	public boolean Search(){
-		
-<<<<<<< HEAD
-		
-<<<<<<< HEAD
-		return isCaptured;	
-=======
-		while(!isCaptured){
-			
-			
-			
-		}
-		
-		
-		
-		
-		
-=======
->>>>>>> flagcapture-ver1
+	public boolean Search() throws InterruptedException{
+
 		
 		/*
 		 * Remember to add a boolean to the odomertry correction thread and set it false here
@@ -88,9 +70,7 @@ public class FlagCapture {
 		 */
 		 
 		
-<<<<<<< HEAD
->>>>>>> origin/master
-=======
+
 		while(!isCaptured){
 						
 			while(getFilteredData(usPoller_left)>0 || getFilteredData(usPoller_right)>0){
@@ -111,18 +91,13 @@ public class FlagCapture {
 				}
 										
 				}
+			return isCaptured;
 		}		
 				
->>>>>>> flagcapture-ver1
-	}
+
 	
 	
-	public void Move(){
-		
-	}
-	
-	
-	 public void Check(){
+	 public void Check() throws InterruptedException{
 		 
 		 forward(7.0);
 			if(Robot.colorPoller.getColor() == (Robot.Opp_Color)){
@@ -130,7 +105,7 @@ public class FlagCapture {
 			}
 			else{
 				if(mainPath){
-				Move();		
+				GetOutTheWay();		
 				mainPath=false;
 				}
 				else{
@@ -147,19 +122,7 @@ public class FlagCapture {
 	 * @return isCaptured Boolean that is true when Flag has been captured.
 	 * @throws InterruptedException 
 	 */
-<<<<<<< HEAD
-=======
-	public boolean captureFlag(){
-		
-		
-		
-		
-		
-		
-		return isCaptured;
-		
-	}
->>>>>>> origin/master
+
 	
 	
 	private int getFilteredData(UltrasonicPoller usPoller) {
@@ -175,7 +138,7 @@ public class FlagCapture {
 	}
 	
 	
-<<<<<<< HEAD
+
 	public void captureFlag() throws InterruptedException{
 		//if setAcceleration is not smooth enough, P-control of arm speed goes here (uses tachocounts)
 		//rotate forward 120 degrees?
@@ -183,6 +146,7 @@ public class FlagCapture {
 		grabberMotor.forward(); //keep applying torque
 		TimeUnit.SECONDS.sleep(3); //give 3 seconds to grab before lifting
 		armMotor.rotate(-120); 
+		this.isCaptured;
 	}
 	
 	public void GetOutTheWay() throws InterruptedException {
@@ -193,7 +157,7 @@ public class FlagCapture {
 		armMotor.rotate(-120);
 	}
 	
-=======
+
 	private void forward(double distance){
 		
 		Robot.leftMotor.setSpeed(Robot.FORWARD_SPEED);
@@ -203,7 +167,7 @@ public class FlagCapture {
 		Robot.rightMotor.rotate(convertDistance(Robot.left_radius, distance), false);
 		
 	}
->>>>>>> flagcapture-ver1
+
 	
 	public  int convertDistance(double radius, double distance) {
 		return (int) ((180.0 * distance) / (Math.PI * radius));
