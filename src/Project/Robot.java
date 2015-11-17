@@ -1,5 +1,6 @@
 package Project;
 
+import lejos.hardware.Button;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.motor.EV3MediumRegulatedMotor;
@@ -28,11 +29,11 @@ public class Robot {
 	public static final PathPlanner planner = new PathPlanner();
 	public static final OdometryCorrection odoCorrector = new OdometryCorrection(); 
 	
-	public static final double left_radius = 2.1;
-	public static final double right_radius = 2.1;
-	public static final double wheel_base = 15.0;
+	public static final double left_radius = 2.01;
+	public static final double right_radius = 2.01;
+	public static final double wheel_base = 15.7;
 	public static final double tile = 30.48; 
-	public static final int ROTATE_SPEED = 80;           
+	public static final int ROTATE_SPEED = 100;           
 	public static final int FORWARD_SPEED = 150;
 
 	
@@ -41,6 +42,8 @@ public class Robot {
 	public static final int MyHome_upperRight[] = new int[2];
 	public static final int OppHome_lowerLeft[] = new int[2];
 	public static final int OppHome_upperRight[] = new int[2];
+	public static final int Opp_Color=1;
+	public static final int Home_Color=1;
 
 	private enum State {
 		LOCALIZE, NAVIGATE, AVOID, CAPTURE, FINISHED
@@ -55,10 +58,11 @@ public class Robot {
 		//adjust coordinates from wifi class to point to middle of the tiles
 		start_corner = 1; 
 		
+		int[] start_coord=new int[2];
 		usPoller_left.start(); 
 		usPoller_right.start(); 
 		odometer.start(); 
-		odoCorrector.start(); 
+//		odoCorrector.start(); 
 
 
 		// state machine loop

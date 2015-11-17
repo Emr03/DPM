@@ -90,9 +90,10 @@ public class FlagCapture {
 					Check();						
 				}
 										
-				}
+			}
+		}
 			return isCaptured;
-		}		
+	}		
 				
 
 	
@@ -146,7 +147,7 @@ public class FlagCapture {
 		grabberMotor.forward(); //keep applying torque
 		TimeUnit.SECONDS.sleep(3); //give 3 seconds to grab before lifting
 		armMotor.rotate(-120); 
-		this.isCaptured;
+		this.isCaptured=true;
 	}
 	
 	public void GetOutTheWay() throws InterruptedException {

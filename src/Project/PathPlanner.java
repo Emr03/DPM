@@ -87,10 +87,10 @@ class PathPlanner {
 	 *            y coordinate in cm
 	 */
 
-	void setDestination(double x, double y) {
+	public void setDestination(int[] x_y) {
 		isReached = false;
-		dest_x = x;
-		dest_y = y;
+		dest_x = x_y[0];
+		dest_y = x_y[1];
 	}
 
 	/**
