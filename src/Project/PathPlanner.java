@@ -96,6 +96,7 @@ class PathPlanner {
 	/**
 	 * path planning method which handles obstacle avoidance
 	 */
+<<<<<<< HEAD
 	void travel() {
 		// 0 is for east tile, 1 for north tile, 2 for west tile, 3 for south
 		// tile
@@ -110,6 +111,20 @@ class PathPlanner {
 			// if closer tile is on the east side
 			if (dest_x - current_x > Robot.tile / 2 && tile_values[0] > 0) {
 				tile_values[0] = 2;
+=======
+	public void travel() {
+		//0 is for east tile, 1 for north tile, 2 for west tile, 3 for south tile  
+		// -1 -> obstacle, 0 -> previous tile, 1-> clear farther, 2 -> clear closer. 
+		int[] tile_values = {1, 1, 1, 1};
+		int best_heading = 0; 
+		
+		while (!isReached) { 
+			
+			//***Evaluate values of east and west tiles***//
+			//if closer tile is on the east side
+			if (dest_x - current_x > Robot.tile/2 && tile_values[0]>0) {
+				tile_values[0] = 2; 
+>>>>>>> flagcapture-ver1
 			}
 			// if closer tile is on the west side
 			else if (dest_x - current_x < -Robot.tile / 2 && tile_values[2] > 0) {
@@ -242,4 +257,6 @@ class PathPlanner {
 	 HEADING getHeading() {
 		return current_H;
 	}
+	
+	
 }
