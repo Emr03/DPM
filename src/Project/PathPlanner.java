@@ -6,7 +6,7 @@ package Project;
 /**
  * 
  * @author DPM TEAM18
- * @version 1.0, 7 Nov 2015 Path planning class with obstacle avoidance
+ * @version 1.0, 10 Nov 2015 Path planning class with obstacle avoidance
  *          capability
  */
 class PathPlanner {
@@ -15,26 +15,67 @@ class PathPlanner {
 	/**
 	 * boolean flag to indicate whether destination is reached
 	 */
-	private static boolean isReached = false;
+	private boolean isReached = false;
 	/**
 	 * destination coordinate in cm
 	 */
-	private static double dest_x, dest_y;
+	private double dest_x, dest_y;
 	/**
 	 * current coordinate in cm
 	 */
-	private static double current_x, current_y;
+	private double current_x, current_y;
 	/**
 	 * current heading
 	 */
-	private static HEADING current_H;
+	private HEADING current_H;
 	/**
 	 * next heading
 	 */
-	private static HEADING new_H;
+	private HEADING new_H;
 
 	enum HEADING {
-	 EAST, NORTH, WEST, SOUTH
+		EAST, NORTH, WEST, SOUTH
+	}
+
+	int[] getEntryPoints() {
+		// we already have the upper right and lower left corners stored in the
+		// main class
+		// the nearby corners would be upper left, and lower right
+		int UR, LL, UL, LR;
+		UR = Robot.OppHome_upperRight[0] - Robot.start_corner[0] + Robot.OppHome_upperRight[1] - Robot.start_corner[1];
+		LL = Robot.OppHome_lowerLeft[0] - Robot.start_corner[0] + Robot.OppHome_lowerLeft[1] - Robot.start_corner[1];
+		UL = Robot.OppHome_lowerLeft[0] - Robot.start_corner[0] + Robot.OppHome_upperRight[1] - Robot.start_corner[1];
+
+		int entry_point[] = new int[2];
+
+		// if wall on the right side
+		if (UR < LL && Robot.OppHome_upperRight[0] == 11) {
+			// entry point is upper left
+			entry_point[0] = Robot.OppHome_lowerLeft[0];
+			entry_point[1] = Robot.OppHome_upperRight[1];
+		}
+
+		// if wall on the top side
+		else if (UR < LL && Robot.OppHome_upperRight[1] == 11) {
+			// entry point is lower right
+			entry_point[0] = Robot.OppHome_upperRight[0];
+			entry_point[1] = Robot.OppHome_lowerLeft[1];
+		}
+
+		// if wall is on the left side
+		else if (LL < UR && Robot.OppHome_lowerLeft[0] == -1) {
+			// entry point is lower right
+			entry_point[0] = Robot.OppHome_upperRight[0];
+			entry_point[1] = Robot.OppHome_lowerLeft[1];
+		}
+
+		// if wall is on the bottom side
+		else if (LL < UR && Robot.OppHome_lowerLeft[1] == -1) {
+			// entry point is upper left
+			entry_point[0] = Robot.OppHome_lowerLeft[0];
+			entry_point[1] = Robot.OppHome_upperRight[1];
+		}
+		return entry_point;
 	}
 
 	/**
@@ -45,7 +86,8 @@ class PathPlanner {
 	 * @param y
 	 *            y coordinate in cm
 	 */
-	public static void setDestination(double x, double y) {
+
+	void setDestination(double x, double y) {
 		isReached = false;
 		dest_x = x;
 		dest_y = y;
@@ -54,6 +96,7 @@ class PathPlanner {
 	/**
 	 * path planning method which handles obstacle avoidance
 	 */
+<<<<<<< HEAD
 	public void travel() {
 		//0 is for east tile, 1 for north tile, 2 for west tile, 3 for south tile  
 		// -1 -> obstacle, 0 -> previous tile, 1-> clear farther, 2 -> clear closer. 
@@ -66,45 +109,62 @@ class PathPlanner {
 			//if closer tile is on the east side
 			if (dest_x - current_x > Robot.tile/2 && tile_values[0]>0) {
 				tile_values[0] = 2; 
+=======
+	void travel() {
+		// 0 is for east tile, 1 for north tile, 2 for west tile, 3 for south
+		// tile
+		// -1 -> obstacle, 0 -> previous tile, 1-> clear farther, 2 -> clear
+		// closer.
+		int[] tile_values = { 1, 1, 1, 1 };
+		int best_heading = 0;
+
+		while (!isReached) {
+
+			// ***Evaluate values of east and west tiles***//
+			// if closer tile is on the east side
+			if (dest_x - current_x > Robot.tile / 2 && tile_values[0] > 0) {
+				tile_values[0] = 2;
+>>>>>>> master
 			}
-			//if closer tile is on the west side 
-			else if (dest_x - current_x < -Robot.tile/2 && tile_values[2]>0){
-				tile_values[2] = 2; 
+			// if closer tile is on the west side
+			else if (dest_x - current_x < -Robot.tile / 2 && tile_values[2] > 0) {
+				tile_values[2] = 2;
 			}
-			//if purely vertical motion, assign horizontal tiles a value of 1
+			// if purely vertical motion, assign horizontal tiles a value of 1
 			else {
-				tile_values[0] = 1; 
-				tile_values[2] = 1; 
+				tile_values[0] = 1;
+				tile_values[2] = 1;
 			}
-			
-			//***Evaluate values of north and south tile***//
-			//if closer tile is to the north
-			if (dest_y - current_y > Robot.tile/2 && tile_values[1]>0){
-				tile_values[1] = 2; 
+
+			// ***Evaluate values of north and south tile***//
+			// if closer tile is to the north
+			if (dest_y - current_y > Robot.tile / 2 && tile_values[1] > 0) {
+				tile_values[1] = 2;
 			}
-			//if closer tile is to the south
-			else if (dest_y - current_y < -Robot.tile/2 && tile_values[3]>0){
-				tile_values[3] = 2; 
+			// if closer tile is to the south
+			else if (dest_y - current_y < -Robot.tile / 2 && tile_values[3] > 0) {
+				tile_values[3] = 2;
 			}
-			//if purely horizontal motion, assign vertical tiles a value of 1
-			else{
-				tile_values[1] = 1; 
-				tile_values[3] = 1; 
+			// if purely horizontal motion, assign vertical tiles a value of 1
+			else {
+				tile_values[1] = 1;
+				tile_values[3] = 1;
 			}
-			
-			//find best heading, look for max value
-			best_heading = findBestHeading(tile_values); 
+
+			// find best heading, look for max value
+			best_heading = findBestHeading(tile_values);
 			new_H = getHeadingfromInt(best_heading);
-			//turn to this "best heading"
-			changeHeading(); 
-			
-			//if obstacle ahead, repeat the while loop. 
-			if (isObstacle()){
-				tile_values[new_H.ordinal()] = -1; 
-				continue; 
+			// turn to this "best heading"
+			changeHeading();
+
+			// if obstacle ahead, repeat the while loop.
+			if (isObstacle()) {
+				tile_values[new_H.ordinal()] = -1;
+				continue;
 			}
-				
-			//at this point, clear tile was found, and robot was turned towards it
+
+			// at this point, clear tile was found, and robot was turned towards
+			// it
 			double[] displacement = { 0, 0 };
 			switch (current_H) {
 			case NORTH:
@@ -127,11 +187,12 @@ class PathPlanner {
 	}
 
 	private boolean isObstacle() {
-		if (Robot.usPoller_left.getDistance()<Robot.tile || Robot.usPoller_right.getDistance()<Robot.tile){
+		if (Robot.usPoller_left.getDistance() < Robot.tile || Robot.usPoller_right.getDistance() < Robot.tile) {
 			return true;
 		}
-		
-		else return false; 
+
+		else
+			return false;
 	}
 
 	private int findBestHeading(int[] tile_values) {
@@ -141,7 +202,7 @@ class PathPlanner {
 				max_index = i;
 			}
 		}
-		return max_index; 
+		return max_index;
 	}
 
 	private HEADING getHeadingfromInt(int max_index) {
@@ -159,19 +220,19 @@ class PathPlanner {
 		case 3:
 			heading = HEADING.SOUTH;
 			break;
-			
+
 		default:
 			heading = HEADING.EAST;
 			break;
 		}
-		
+
 		return heading;
 	}
 
 	/**
 	 * Changes the robot's heading depending on planned path
 	 */
-	private static void changeHeading() {
+	private void changeHeading() {
 		double theta;
 		switch (new_H) {
 		case NORTH:
@@ -193,7 +254,7 @@ class PathPlanner {
 		current_H = new_H;
 	}
 
-	public HEADING getHeading() {
+	 HEADING getHeading() {
 		return current_H;
 	}
 	
