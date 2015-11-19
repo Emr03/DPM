@@ -37,46 +37,46 @@ class PathPlanner {
 		EAST, NORTH, WEST, SOUTH
 	}
 
-	int[] getEntryPoints() {
-		// we already have the upper right and lower left corners stored in the
-		// main class
-		// the nearby corners would be upper left, and lower right
-		int UR, LL, UL, LR;
-		UR = Robot.OppHome_upperRight[0] - Robot.start_corner[0] + Robot.OppHome_upperRight[1] - Robot.start_corner[1];
-		LL = Robot.OppHome_lowerLeft[0] - Robot.start_corner[0] + Robot.OppHome_lowerLeft[1] - Robot.start_corner[1];
-		UL = Robot.OppHome_lowerLeft[0] - Robot.start_corner[0] + Robot.OppHome_upperRight[1] - Robot.start_corner[1];
-
-		int entry_point[] = new int[2];
-
-		// if wall on the right side
-		if (UR < LL && Robot.OppHome_upperRight[0] == 11) {
-			// entry point is upper left
-			entry_point[0] = Robot.OppHome_lowerLeft[0];
-			entry_point[1] = Robot.OppHome_upperRight[1];
-		}
-
-		// if wall on the top side
-		else if (UR < LL && Robot.OppHome_upperRight[1] == 11) {
-			// entry point is lower right
-			entry_point[0] = Robot.OppHome_upperRight[0];
-			entry_point[1] = Robot.OppHome_lowerLeft[1];
-		}
-
-		// if wall is on the left side
-		else if (LL < UR && Robot.OppHome_lowerLeft[0] == -1) {
-			// entry point is lower right
-			entry_point[0] = Robot.OppHome_upperRight[0];
-			entry_point[1] = Robot.OppHome_lowerLeft[1];
-		}
-
-		// if wall is on the bottom side
-		else if (LL < UR && Robot.OppHome_lowerLeft[1] == -1) {
-			// entry point is upper left
-			entry_point[0] = Robot.OppHome_lowerLeft[0];
-			entry_point[1] = Robot.OppHome_upperRight[1];
-		}
-		return entry_point;
-	}
+//	int[] getEntryPoints() {
+//		// we already have the upper right and lower left corners stored in the
+//		// main class
+//		// the nearby corners would be upper left, and lower right
+//		int UR, LL, UL, LR;
+//		UR = Robot.OppHome_upperRight[0] - Robot.start_corner[0] + Robot.OppHome_upperRight[1] - Robot.start_corner[1];
+//		LL = Robot.OppHome_lowerLeft[0] - Robot.start_corner[0] + Robot.OppHome_lowerLeft[1] - Robot.start_corner[1];
+//		UL = Robot.OppHome_lowerLeft[0] - Robot.start_corner[0] + Robot.OppHome_upperRight[1] - Robot.start_corner[1];
+//
+//		int entry_point[] = new int[2];
+//
+//		// if wall on the right side
+//		if (UR < LL && Robot.OppHome_upperRight[0] == 11) {
+//			// entry point is upper left
+//			entry_point[0] = Robot.OppHome_lowerLeft[0];
+//			entry_point[1] = Robot.OppHome_upperRight[1];
+//		}
+//
+//		// if wall on the top side
+//		else if (UR < LL && Robot.OppHome_upperRight[1] == 11) {
+//			// entry point is lower right
+//			entry_point[0] = Robot.OppHome_upperRight[0];
+//			entry_point[1] = Robot.OppHome_lowerLeft[1];
+//		}
+//
+//		// if wall is on the left side
+//		else if (LL < UR && Robot.OppHome_lowerLeft[0] == -1) {
+//			// entry point is lower right
+//			entry_point[0] = Robot.OppHome_upperRight[0];
+//			entry_point[1] = Robot.OppHome_lowerLeft[1];
+//		}
+//
+//		// if wall is on the bottom side
+//		else if (LL < UR && Robot.OppHome_lowerLeft[1] == -1) {
+//			// entry point is upper left
+//			entry_point[0] = Robot.OppHome_lowerLeft[0];
+//			entry_point[1] = Robot.OppHome_upperRight[1];
+//		}
+//		return entry_point;
+//	}
 
 	/**
 	 * sets the destination coordinates
@@ -172,7 +172,7 @@ class PathPlanner {
 	}
 
 	private boolean isObstacle() {
-		if (Robot.usPoller_left.getDistance() < Robot.tile || Robot.usPoller_right.getDistance() < Robot.tile) {
+		if ( Robot.usPoller_right.getDistance() < Robot.tile) {
 			return true;
 		}
 

@@ -46,7 +46,7 @@ public class FlagCapture {
 
 		armMotor.setAcceleration(3000);
 
-		this.usPoller_left=Robot.usPoller_left;
+//		this.usPoller_left=Robot.usPoller_left;
 		this.usPoller_right=Robot.usPoller_right;
 		
 	}

@@ -1,13 +1,13 @@
 package Project;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+
 import Project.Odometer;
 import Project.UltrasonicPoller;
 import lejos.hardware.Sound;
-
-
-
-
-
+import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 /**
  * Localization CLass
@@ -20,204 +20,238 @@ import lejos.hardware.Sound;
  * 
  */
 
+public class Localization {
 
-public class Localization{
-	public static int ROTATION_SPEED = 30;
-	public enum LocalizationType { FACING_AWAY, FACING_WALL};
+	public enum LocalizationType {
+		FALLING_EDGE, RISING_EDGE
+	};
 
-	private Odometer odo;
-	private int corner=0 ;
-	private UltrasonicPoller usPoller_left;
-	private UltrasonicPoller usPoller_right;
+	public static int ROTATION_SPEED = 100;
 
+	private Odometer odometer;
+	private Navigation navigator;
 	private LocalizationType locType;
-	private final int maxDist = 50;
-	private final int d = 30;
-	private final int k = 7;
-	
-	/**
-	 * Creates an Object of type Localization
-	 * @param odo Odometer
-	 * @param usPoller_left UltrasonicPoller
-	 * @param usPoller_right UltrasonicPoller
-	 * @param corner int
-	 */
-	
-	public Localization() {
-		this.odo = Robot.odometer;
-		this.corner=Robot.start_corner;
-		this.usPoller_left=Robot.usPoller_left;
-		this.usPoller_right=Robot.usPoller_right;
-	}
-	
-	
-	
-	public void begin(){
-		
-		if(getFilteredData(usPoller_left)<d-k && getFilteredData(usPoller_right )< d-k){
-			locType=LocalizationType.FACING_WALL;
-			doLocalization();
-		}
-		else{
-			locType=LocalizationType.FACING_AWAY;
-			doLocalization();
-		}
-		
-	}
-	
-	
-	/**
-	 * Localizes the Robot using Rising edge method
-	 *
-	 * 
-	 */
-	
-	public void doLocalization(){
-		
-		
-		if(locType==LocalizationType.FACING_WALL){
-			
-			double angleA, angleB;
-			
-			// rotate the robot until it sees no wall then stop and latch
-			//rising edge
-			turn(false);
-			while(getFilteredData(usPoller_left)<maxDist);
-			halt();	
-			angleA= Math.toDegrees(odo.getTheta());
-			Sound.twoBeeps();
-			
-	
-			// keep the same direction and wait until it sees no wall then stop and latch
-			//falling edge
-			turn(false);
-			while(getFilteredData(usPoller_left)> d-k);
-			halt();
-			angleB=Math.toDegrees(odo.getTheta());
-			Sound.twoBeeps();	
-			
-			
-			computeAngle(angleA, angleB);
-			
-		}
-		else{
-		double angleA, angleB;
-		
-		
-		// rotate the robot until it sees wall then stop and latch angle
-		//Falling edge
-		turn(true);
-		while(getFilteredData(usPoller_right)>d-k);
-		halt();
-		angleA= Math.toDegrees(odo.getTheta());
-		Sound.twoBeeps();
-		
-		
-		//keep rotating till the wall disappears, then store the angle
-		//Rising edge
-		turn(true);
-		while(getFilteredData(usPoller_right)<d+k);
-		halt();
-		angleB=Math.toDegrees(odo.getTheta());
-		Sound.twoBeeps();
-		
-		
-		computeAngle(angleA, angleB);
-		
-		}	
-		
-	}
-	
+	private EV3LargeRegulatedMotor leftMotor, rightMotor;
+	private UltrasonicPoller usPoller_left, usPoller_right;
 
-	/**
-	 * This method returns filtered data on the distances recored by the US Poller Class.
-	 * @param usPoller UltrasonicPoller
-	 * @return distance int
-	 */
-	private int getFilteredData(UltrasonicPoller usPoller) {
-		
-		int distance = usPoller.getDistance();
-		
-		if (distance> 30){
-			distance=maxDist;
+	double d = 34, k = 2;
+
+	private int corner;
+
+	public Localization() {
+
+		this.corner = Robot.start_corner;
+		this.odometer = Robot.odometer;
+		this.navigator = Robot.navigator;
+		this.locType = LocalizationType.FALLING_EDGE;
+		this.leftMotor = Robot.leftMotor;
+		this.rightMotor = Robot.rightMotor;
+		this.usPoller_right = Robot.usPoller_right;
+
+	}
+
+	public void doLocalization() {
+
+		double angleA, angleB;
+		leftMotor.setSpeed(ROTATION_SPEED);
+		rightMotor.setSpeed(ROTATION_SPEED);
+
+		if (locType == LocalizationType.FALLING_EDGE) {
+
+			// set robot to rotate clockwise for first falling edge
+			leftMotor.forward();
+			rightMotor.backward();
+			angleA = detectFallingEdge();
+
+			leftMotor.startSynchronization();
+			leftMotor.stop();
+			rightMotor.stop();
+			leftMotor.endSynchronization();
+
+			// Switch direction to counterclockwise
+			leftMotor.backward();
+			rightMotor.forward();
+			angleB = detectFallingEdge();
+
+			leftMotor.startSynchronization();
+			leftMotor.stop();
+			rightMotor.stop();
+			leftMotor.endSynchronization();
+
+			double deltaT = (angleA > angleB) ? 5 * Math.PI / 4 : Math.PI / 4;
+			deltaT = deltaT - ((angleA + angleB) / 2);
+
+			updateHeading(deltaT);
 		}
-	
-					
+
+		else {
+			leftMotor.forward();
+			rightMotor.backward();
+
+			angleA = detectRisingEdge();
+
+			leftMotor.startSynchronization();
+			leftMotor.stop();
+			rightMotor.stop();
+			leftMotor.endSynchronization();
+
+			leftMotor.backward();
+			rightMotor.forward();
+
+			angleB = detectRisingEdge();
+
+			leftMotor.startSynchronization();
+			leftMotor.stop();
+			rightMotor.stop();
+			leftMotor.endSynchronization();
+
+			double deltaT = (angleA < angleB) ? 5 * Math.PI / 4 : Math.PI / 4;
+			deltaT = deltaT - ((angleA + angleB) / 2);
+			updateHeading(deltaT); 	
+		}
+
+		navigator.turnTo(0);
+
+	}
+
+	private void updateHeading(double deltaT) {
+		switch (this.corner) {
+
+		// Corner 1
+		case 1:
+			odometer.setPosition(new double[] { 0.0, 0.0, odometer.getTheta() + deltaT },
+					new boolean[] { false, false, true });
+			break;
+
+		// depends if started facing or away
+		// -90
+		case 2:
+			odometer.setPosition(new double[] { 0.0, 0.0, odometer.getTheta() + deltaT + Math.PI / 2 },
+					new boolean[] { false, false, true });
+			break;
+
+		// Corner 3, same as 1 but minus 180
+		case 3:
+			odometer.setPosition(new double[] { 0.0, 0.0, odometer.getTheta() + deltaT + Math.PI },
+					new boolean[] { false, false, true });
+			break;
+
+		// Corner 4 same as case 2 but minus 180
+		// +90
+		case 4:
+
+			odometer.setPosition(new double[] { 0.0, 0.0, odometer.getTheta() + deltaT - Math.PI / 2 },
+					new boolean[] { false, false, true });
+			break;
+
+		}
+	}
+
+	private double detectFallingEdge() {
+
+		double dist; // variable to store reading of the ultrasonic sensor
+		double angle = 0;
+		double edge1 = 0, edge2 = 0;
+		boolean falling_edge = false;
+		dist = getFilteredData(usPoller_right);
+
+		// rotate until it sees no wall
+		while (dist < d + k)
+			dist = getFilteredData(usPoller_right); // Get ultrasonic sensor
+													// reading.
+
+		Sound.beep();
+		// keep rotating until it sees a wall
+		while (dist >= d + k)
+			dist = getFilteredData(usPoller_right); // Get ultrasonic sensor
+													// reading.
+
+		Sound.beep();
+		// it entered the noise margin
+		if (dist < d + k && dist > d - k)
+			edge1 = odometer.getTheta();
+
+		// if sudden drop below noise margin
+		else {
+			falling_edge = true;
+			angle = odometer.getTheta();
+		}
+
+		// if falling edge not yet detected
+		while (!falling_edge) {
+			dist = getFilteredData(usPoller_right);
+			if (dist <= d - k) {
+				edge2 = odometer.getTheta();
+				angle = (edge1 + edge2) / 2;
+				falling_edge = true;
+			}
+
+		}
+
+		return angle;
+
+	}
+
+	private double detectRisingEdge() {
+		double dist; // variable to store reading of the ultrasonic sensor
+		double angle = 0;
+		double edge1 = 0, edge2 = 0;
+		boolean rising_edge = false;
+		dist = getFilteredData(usPoller_right);
+
+		// rotate until it sees a wall
+		while (dist > d + k)
+			dist = getFilteredData(usPoller_right); // Get ultrasonic sensor
+													// reading.
+
+		Sound.beep();
+		// keep rotating until it sees a rising edge
+		while (dist <= d + k)
+			dist = getFilteredData(usPoller_right); // Get ultrasonic sensor
+													// reading.
+
+		// it entered the noise margin
+		if (Math.abs(dist - d) < k)
+			edge1 = odometer.getTheta();
+
+		// if sudden rise above noise margin
+		else {
+			rising_edge = true;
+			angle = odometer.getTheta();
+		}
+
+		Sound.beep();
+		// if rising edge not yet detected
+		while (!rising_edge) {
+			dist = getFilteredData(usPoller_right);
+			if (dist >= d + k) {
+				edge2 = odometer.getTheta();
+				angle = (edge1 + edge2) / 2;
+				rising_edge = true;
+			}
+
+		}
+
+		Sound.beep();
+		Sound.beep();
+		Sound.beep();
+
+		return angle;
+
+	}
+
+	public float getFilteredData(UltrasonicPoller usPoller) {
+		// use filter control!!
+		boolean largeDistanceDetected = false;
+		int distance = usPoller.getDistance();
+		if (distance > 50 && !largeDistanceDetected) {
+			largeDistanceDetected = true;
+			distance = usPoller.getDistance();
+		}
+		if (distance > 50 && largeDistanceDetected)
+			distance = 50;
+
 		return distance;
 	}
-	
-	private void computeAngle(double angleA, double angleB){
-		
-		double deltaTheta=0;
-		deltaTheta=computeDeltaTheta(angleA,angleB);
-		switch(this.corner){
-		
-		//Corner 1
-		case 1:
-			odo.setPosition(new double [] {0.0, 0.0, (Math.toDegrees(odo.getTheta())+deltaTheta)}, new boolean [] {false, false, true});
-			break;
-			
-		//depends if started facing or away	
-		//-90
-		case 2:
-			odo.setPosition(new double [] {0.0, 0.0, ((Math.toDegrees(odo.getTheta())+deltaTheta)+90)}, new boolean [] {false, false, true});
-			break;
-			
-			
-		//Corner 3, same as 1 but minus 180
-		case 3:
-			odo.setPosition(new double [] {0.0, 0.0, ((Math.toDegrees(odo.getTheta())+deltaTheta)+180)}, new boolean [] {false, false, true});
-			break;
-			
-		//Corner 4 same as case 2 but minus 180
-		//+90
-		case 4:
-			
-			odo.setPosition(new double [] {0.0, 0.0, ((Math.toDegrees(odo.getTheta())+deltaTheta)-90)}, new boolean [] {false, false, true});
-			break;
-				
-		}
-		Robot.navigator.turnTo(0.0);
-	}
-	
-	
-	private double computeDeltaTheta(double angleA, double angleB){
-		
-		double deltaTheta;
-		
-		if (angleA > angleB) {
-			deltaTheta = 225 - (angleA + angleB)/2;
-		} else {
-			deltaTheta = 45 - (angleA + angleB)/2;
-			}
-		
-		return deltaTheta;
-		
-	}
-	
-	// turns the robot in a circle until stopped
-	public void turn (boolean clockwise) {
-		
-		Robot.leftMotor.setSpeed(ROTATION_SPEED);
-		Robot.rightMotor.setSpeed(ROTATION_SPEED);
-			
-		if (clockwise) {	
-			Robot.leftMotor.forward();
-			Robot.rightMotor.backward();
-		} else {
-			Robot.leftMotor.backward();
-			Robot.rightMotor.forward();
-		}
-		
-	}
-	
-	public void halt(){
-		Robot.leftMotor.stop();
-		Robot.rightMotor.stop();
-	}
-	
-	
-	
 
 }
-
