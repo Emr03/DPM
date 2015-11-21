@@ -26,7 +26,7 @@ public class Localization {
 		FALLING_EDGE, RISING_EDGE
 	};
 
-	public static int ROTATION_SPEED = 100;
+	public static int ROTATION_SPEED = 150;
 
 	private Odometer odometer;
 	private Navigation navigator;
@@ -34,13 +34,12 @@ public class Localization {
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
 	private UltrasonicPoller usPoller_left, usPoller_right;
 
-	double d = 34, k = 2;
+	double d = 34, k = 1;
 
-	private int corner;
+	private int corner=1;
 
 	public Localization() {
 
-		this.corner = Robot.start_corner;
 		this.odometer = Robot.odometer;
 		this.navigator = Robot.navigator;
 		this.locType = LocalizationType.FALLING_EDGE;
@@ -52,6 +51,7 @@ public class Localization {
 
 	public void doLocalization() {
 
+		this.corner = Robot.corner.getId();
 		double angleA, angleB;
 		leftMotor.setSpeed(ROTATION_SPEED);
 		rightMotor.setSpeed(ROTATION_SPEED);
@@ -80,8 +80,9 @@ public class Localization {
 
 			double deltaT = (angleA > angleB) ? 5 * Math.PI / 4 : Math.PI / 4;
 			deltaT = deltaT - ((angleA + angleB) / 2);
-
-			updateHeading(deltaT);
+			deltaT = odometer.getTheta() + deltaT;
+			odometer.setTheta(deltaT); // Update the current orientation.
+			// updateHeading(deltaT);
 		}
 
 		else {
@@ -107,7 +108,8 @@ public class Localization {
 
 			double deltaT = (angleA < angleB) ? 5 * Math.PI / 4 : Math.PI / 4;
 			deltaT = deltaT - ((angleA + angleB) / 2);
-			updateHeading(deltaT); 	
+			deltaT = odometer.getTheta() + deltaT;
+			updateHeading(deltaT);
 		}
 
 		navigator.turnTo(0);
@@ -119,29 +121,23 @@ public class Localization {
 
 		// Corner 1
 		case 1:
-			odometer.setPosition(new double[] { 0.0, 0.0, odometer.getTheta() + deltaT },
-					new boolean[] { false, false, true });
+			odometer.setTheta(deltaT);
 			break;
 
-		// depends if started facing or away
-		// -90
+		// +90
 		case 2:
-			odometer.setPosition(new double[] { 0.0, 0.0, odometer.getTheta() + deltaT + Math.PI / 2 },
-					new boolean[] { false, false, true });
+			odometer.setTheta(deltaT + Math.PI / 2);
 			break;
 
 		// Corner 3, same as 1 but minus 180
 		case 3:
-			odometer.setPosition(new double[] { 0.0, 0.0, odometer.getTheta() + deltaT + Math.PI },
-					new boolean[] { false, false, true });
+			odometer.setTheta(deltaT + Math.PI);
 			break;
 
 		// Corner 4 same as case 2 but minus 180
 		// +90
 		case 4:
-
-			odometer.setPosition(new double[] { 0.0, 0.0, odometer.getTheta() + deltaT - Math.PI / 2 },
-					new boolean[] { false, false, true });
+			odometer.setTheta(deltaT - Math.PI / 2);
 			break;
 
 		}
@@ -160,7 +156,6 @@ public class Localization {
 			dist = getFilteredData(usPoller_right); // Get ultrasonic sensor
 													// reading.
 
-		Sound.beep();
 		// keep rotating until it sees a wall
 		while (dist >= d + k)
 			dist = getFilteredData(usPoller_right); // Get ultrasonic sensor

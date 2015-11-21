@@ -23,6 +23,8 @@ public class UltrasonicPoller extends Thread {
 	private float[] usData;
 	public int distance;
 	private Object lock = new Object();
+	private int filterControl = 0;
+	private int FILTER_OUT = 2;
 	
 
 	/**
@@ -48,10 +50,12 @@ public class UltrasonicPoller extends Thread {
 	
 	
 	public void run() {
+		int d; 
 		while (true) {
 			us.fetchSample(usData, 0); // acquire data
 			synchronized (lock){
-				this.distance = (int) (usData[0] * 100); // extract from buffer,
+				d = (int) (usData[0] * 100); // extract from buffer,
+				this.distance = getFilteredData(d); 
 			}	
 			try {
 				Thread.sleep(50);
@@ -72,5 +76,25 @@ public class UltrasonicPoller extends Thread {
 		}
 	}
 	
+	public int getFilteredData(int d) {
+		// use filter control!!
+		if(d >= 100 && filterControl < FILTER_OUT) {
+			filterControl ++;
+		} 
+		
+		// actual value, the distance is indeed greater than 100, so set the distance variable
+		else if(d >= 100){
+			this.distance = d;
+		}
+		
+		// distance went below 70, therefore reset everything.
+		else{
+			filterControl = 0;
+			this.distance = d;
+		}
+		
+		
+		return this.distance;
+	}
 
 }

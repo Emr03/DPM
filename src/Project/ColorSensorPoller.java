@@ -23,7 +23,7 @@ public class ColorSensorPoller extends Thread{
 	private SampleProvider colorValue;
 	private float[] colorData;
 	public float colorID;
-	private Object lock;
+	private Object lock = new Object();
 	
 	
 	/**

@@ -19,7 +19,7 @@ package Project;
 	private boolean isNavigating = false;       //boolean that is set to true while the robot navigate    s  
 	
 	/** tolerated error in heading in radians**/
-	private double theta_tolerance = 0.087;
+	private double theta_tolerance = 0.067;
 	
 	/** tolerated errror in position in cm**/
 	private int dist_tolerance = 1; 
@@ -124,10 +124,8 @@ package Project;
 	 * stops motors synchronously
 	 */
 	public void stopMotors() {
-		Robot.leftMotor.startSynchronization();
-		Robot.leftMotor.stop(); 
-		Robot.rightMotor.stop();
-		Robot.leftMotor.endSynchronization();
+		Robot.leftMotor.stop(true); 
+		Robot.rightMotor.stop(false);
 	}
 
 	/**
@@ -162,3 +160,4 @@ package Project;
 
 
 }
+

@@ -33,7 +33,7 @@ public class FlagCapture {
 	//angle in radians toward which to turn to throw non flags
 	private double PHI ; 
 	//entry tile in search routine
-	private int [] search_start; 
+	private int [] search_start;
 	
 	/**
 	 * Creates an Object of type FlagCapture
@@ -47,8 +47,8 @@ public class FlagCapture {
 		armMotor.setAcceleration(3000);
 
 //		this.usPoller_left=Robot.usPoller_left;
-		this.usPoller_right=Robot.usPoller_right;
-		
+		this.usPoller_right = Robot.usPoller_right;
+		this.usPoller_left = Robot.usPoller_left; 
 	}
 	
 	
@@ -57,8 +57,7 @@ public class FlagCapture {
 	 * 
 	 */
 	public boolean Search() throws InterruptedException{
-
-		
+	
 		/*
 		 * Remember to add a boolean to the odomertry correction thread and set it false here
 		 * 
@@ -69,8 +68,6 @@ public class FlagCapture {
 		 * 
 		 */
 		 
-		
-
 		while(!isCaptured){
 						
 			while(getFilteredData(usPoller_left)>0 || getFilteredData(usPoller_right)>0){
@@ -118,28 +115,22 @@ public class FlagCapture {
 	
 	
 	
+
+	private int getFilteredData(UltrasonicPoller usPoller) {
+		
+		int distance = usPoller.getDistance();
+		if (distance> 30){
+			distance=maxDist;
+		}		
+		return distance;
+	}
+	
+	
 	/**
 	 * This method captures the Flag once found
 	 * @return isCaptured Boolean that is true when Flag has been captured.
 	 * @throws InterruptedException 
 	 */
-
-	
-	
-	private int getFilteredData(UltrasonicPoller usPoller) {
-		
-		int distance = usPoller.getDistance();
-		
-		if (distance> 30){
-			distance=maxDist;
-		}
-	
-					
-		return distance;
-	}
-	
-	
-
 	public void captureFlag() throws InterruptedException{
 		//if setAcceleration is not smooth enough, P-control of arm speed goes here (uses tachocounts)
 		//rotate forward 120 degrees?
