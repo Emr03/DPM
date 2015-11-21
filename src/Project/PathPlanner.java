@@ -11,7 +11,7 @@ import lejos.hardware.Sound;
  * @version 1.0, 10 Nov 2015 Path planning class with obstacle avoidance
  *          capability
  */
-class PathPlanner {
+public class PathPlanner {
 
 	// private static final int partition_size = 4;
 	/**
@@ -96,7 +96,7 @@ class PathPlanner {
 			current_y = Math.round(Robot.odometer.getY()/Robot.tile); 
 	
 			
-			if (current_x == dest_x && current_y == dest_y){
+			if (current_x == Math.round(dest_x/Robot.tile) && current_y == Math.round(dest_y/Robot.tile)){
 				isReached = true; 
 				break; 
 			}

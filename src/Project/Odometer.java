@@ -6,7 +6,7 @@ package Project;
  * @version 1.0, 7 Nov 2015
  * implements simple odometry using the motor's tachometers
  */
-class Odometer extends Thread {
+public class Odometer extends Thread {
 
 	private static double x = 0, y = 0, theta = Math.PI / 2;
 

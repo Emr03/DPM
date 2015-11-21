@@ -9,7 +9,7 @@ package Project;
  * provides methods for controlling the robot's motion
  */
 
- class Navigation {
+ public class Navigation {
 
 	private static double currentX, currentY, currentT; 
 	

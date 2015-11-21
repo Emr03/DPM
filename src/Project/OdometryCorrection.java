@@ -9,7 +9,7 @@ import Project.PathPlanner.HEADING;
  * implements odometry correction by detecting grid lines
  */
 
-class OdometryCorrection extends Thread {
+public class OdometryCorrection extends Thread {
 	private static final long CORRECTION_PERIOD = 10;
 	
 	//private static final double d = 1.5; 
