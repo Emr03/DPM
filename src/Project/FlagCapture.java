@@ -33,17 +33,23 @@ public class FlagCapture {
 	//angle in radians toward which to turn to throw non flags
 	private double PHI ; 
 	//entry tile in search routine
-	private int [] search_start;
+	private double [] search_start;
+	// outer index of 2D Waypoint array
+	private int x=0;
+	//tolerated distance error from  waypoint
+	private double dist_error= 1.5;
+	
+	
 	
 	/**
 	 * Creates an Object of type FlagCapture
 	 * @param flagColor float representing color of opponents flag
 	 */
 	
-	public FlagCapture(float flagColor){
+	public FlagCapture(float flagColor, double[] entry_points){
 		this.flagColor=flagColor;
 		this.isCaptured=false;
-
+		this.search_start=entry_points;
 		armMotor.setAcceleration(3000);
 
 //		this.usPoller_left=Robot.usPoller_left;
@@ -51,12 +57,22 @@ public class FlagCapture {
 		this.usPoller_left = Robot.usPoller_left; 
 	}
 	
-	
+	double[][] getWaypoints(){
+		
+		//An array of each waypoint and its x&y position
+		double [][] Waypoint= new double[5][2];
+		
+		if(search_start)
+		
+		
+		
+	}
 	/**
 	 * This method searches for the Flag
+	 * @return 
 	 * 
 	 */
-	public boolean Search() throws InterruptedException{
+	public void Search() throws InterruptedException{
 	
 		/*
 		 * Remember to add a boolean to the odomertry correction thread and set it false here
@@ -69,40 +85,57 @@ public class FlagCapture {
 		 */
 		 
 		while(!isCaptured){
-						
-			while(getFilteredData(usPoller_left)>0 || getFilteredData(usPoller_right)>0){
-						
-				forward(15);
-				while(getFilteredData(usPoller_left)>maxDist || getFilteredData(usPoller_right)>maxDist);
-				Check();
-						
-				if(Robot.odometer.getTheta()==Math.PI/2){
-					Robot.navigator.turnTo(0.0);				
-				}	
-					
-				forward(15);
-				while(getFilteredData(usPoller_left)>maxDist || getFilteredData(usPoller_right)>maxDist);
-					
-				if(getFilteredData(usPoller_left)<maxDist || getFilteredData(usPoller_right)<maxDist){
-					Check();						
-				}
+			
+			while(!atWaypoint(x))	{
+					forward();
+					while(!isObstacle());
+					Investigate();				
+			}					
 										
-			}
 		}
-			return isCaptured;
+			
 	}		
 				
+	private boolean isObstacle() {
+		if ((Robot.usPoller_left.getDistance() < 10 ||  Robot.usPoller_right.getDistance() < 10)) {
+			return true;
+		}
 
+		else
+			return false;
+	}
 	
-	
-	 public void Check() throws InterruptedException{
-		 
-		 forward(7.0);
-			if(Robot.colorPoller.getColor() == (Robot.Opp_Color)){
-				captureFlag();					
+	private boolean atWaypoint(int x){
+		double deltaX= Waypoint[x][0]-Robot.odometer.getX();
+		double deltaY= Waypoint[x][1]-Robot.odometer.getY();
+		if(Math.abs(deltaX)<dist_error && Math.abs(deltaY)<dist_error){
+			this.x++;
+			if(x%2==0){
+				
+				
 			}
-			else{
-				if(mainPath){
+			return true;
+		}
+		else
+			return false;
+		
+	}
+	
+	
+	/*
+	 * Notes on investigate: 
+	 * 
+	 * what to do if it is the wrong flag: throw it West or east depending
+	 */
+	 public void Investigate() throws InterruptedException{
+		
+		forward();
+		while(Robot.colorPoller.getColor()>=14);
+		if(Robot.colorPoller.getColor() == (Robot.Opp_Color)){
+			captureFlag();					
+		}
+		else{
+			if(mainPath){
 				GetOutTheWay();		
 				mainPath=false;
 				}
@@ -113,17 +146,7 @@ public class FlagCapture {
 			}
 	 }
 	
-	
-	
 
-	private int getFilteredData(UltrasonicPoller usPoller) {
-		
-		int distance = usPoller.getDistance();
-		if (distance> 30){
-			distance=maxDist;
-		}		
-		return distance;
-	}
 	
 	
 	/**
@@ -150,24 +173,24 @@ public class FlagCapture {
 	}
 	
 
-	private void forward(double distance){
+	private void forward(){
 		
 		Robot.leftMotor.setSpeed(Robot.FORWARD_SPEED);
 		Robot.rightMotor.setSpeed(Robot.FORWARD_SPEED);
 		
-		Robot.leftMotor.rotate(convertDistance(Robot.left_radius, distance), true);
-		Robot.rightMotor.rotate(convertDistance(Robot.left_radius, distance), false);
+		Robot.leftMotor.forward();
+		Robot.rightMotor.forward();
 		
 	}
 
 	
-	public  int convertDistance(double radius, double distance) {
-		return (int) ((180.0 * distance) / (Math.PI * radius));
-	}
-
-	public  int convertAngle(double radius, double width, double angle) {
-		return convertDistance(radius, Math.PI * width * angle / 360.0);
-	}
+//	public  int convertDistance(double radius, double distance) {
+//		return (int) ((180.0 * distance) / (Math.PI * radius));
+//	}
+//
+//	public  int convertAngle(double radius, double width, double angle) {
+//		return convertDistance(radius, Math.PI * width * angle / 360.0);
+//	}
 	
 
 }

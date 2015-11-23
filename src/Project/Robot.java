@@ -53,6 +53,7 @@ public class Robot {
 	static int start_coord[] = {0,0};
 	
 	
+	
 	private enum State {
 		LOCALIZE, NAVIGATE, AVOID, CAPTURE, FINISHED
 	}
@@ -105,10 +106,11 @@ public class Robot {
 		leftMotor.setAcceleration(3000);
 		rightMotor.setAcceleration(3000);
 		
-		planner.setDestination(planner.getEntryPoints()); 
+		double[] entry_points=planner.getEntryPoints();
+		planner.setDestination(entry_points); 
 		planner.travel(); 
 		
-		/*FlagCapture IwannaWin = new FlagCapture(Opp_Color); 
+		/*FlagCapture IwannaWin = new FlagCapture(Opp_Color,entry_points); 
 		try {
 			IwannaWin.Search();
 		} catch (InterruptedException e) {

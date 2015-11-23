@@ -16,7 +16,7 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
  * 
  * 
  * @author DPM TEAM18
- * @version 1.0, 7 Nov 2015
+ * @version 2.0, 17 Nov 2015
  * 
  */
 
@@ -36,7 +36,7 @@ public class Localization {
 
 	double d = 34, k = 1;
 
-	private int corner=1;
+	private int corner=0;
 
 	public Localization() {
 
