@@ -65,11 +65,7 @@ public class FlagCapture {
 		this.usPoller_left = Robot.usPoller_left; 
 	}
 	
-	
-	/*
-	 * finish populating waypts
-	 */
-	double[][] getWaypoints(){
+	private void setCorner(){
 		
 		//An array of each waypoint and its x&y position
 		double top= (Robot.MyHome_upperRight[1])*Robot.tile + Robot.tile/2;
@@ -87,35 +83,57 @@ public class FlagCapture {
 			}
 			search_corner=2;
 		}
-		
+	}	
+	private double[][] getWaypoints(){
 		switch(search_corner){
 		case 1:
 			this.Waypoint[0][0]=Robot.odometer.getX();
 			this.Waypoint[0][1]=(Robot.odometer.getY()+ (3*Robot.tile));
-			this.Waypoint[1][0]=Robot.odometer.getX()+Robot.tile/2;
-			this.Waypoint[1][0]=Robot.odometer.getY();
-			this.Waypoint[2][0]=Robot.odometer.getX();
-			this.Waypoint[2][1]=(Robot.odometer.getY()- (2.5*Robot.tile));
-			this.Waypoint[3][0]=Robot.odometer.getX()+Robot.tile/2;
-			this.Waypoint[3][1]=Robot.odometer.getY();
-			this.Waypoint[4][0]=Robot.odometer.getX();
-			this.Waypoint[4][1]=(Robot.odometer.getY()+ (2.5*Robot.tile));
+			this.Waypoint[1][0]=Waypoint[0][0]+Robot.tile/2;
+			this.Waypoint[1][1]=Waypoint[0][1];
+			this.Waypoint[2][0]=Waypoint[1][0];
+			this.Waypoint[2][1]=Waypoint[1][1]- (2.5*Robot.tile);
+			this.Waypoint[3][0]=Waypoint[2][0]+Robot.tile/2;
+			this.Waypoint[3][1]=Waypoint[2][1];
+			this.Waypoint[4][0]=Waypoint[3][0];
+			this.Waypoint[4][1]=Waypoint[3][1]+ (2.5*Robot.tile);
 			break;
 		case 2:
 			this.Waypoint[0][0]=Robot.odometer.getX();
 			this.Waypoint[0][1]=(Robot.odometer.getY()+ (3*Robot.tile));
-			
+			this.Waypoint[1][0]=Waypoint[0][0]-Robot.tile/2;
+			this.Waypoint[1][1]=Waypoint[0][1];
+			this.Waypoint[2][0]=Waypoint[1][0];
+			this.Waypoint[2][1]=Waypoint[1][1]-(2.5*Robot.tile);
+			this.Waypoint[3][0]=Waypoint[2][0]-Robot.tile/2;
+			this.Waypoint[3][1]=Waypoint[2][1];
+			this.Waypoint[4][0]=Waypoint[3][0];
+			this.Waypoint[4][1]=Waypoint[3][1]+(2.5*Robot.tile);
 			break;
 		case 3:
 			this.Waypoint[0][0]=Robot.odometer.getX();
 			this.Waypoint[0][1]=(Robot.odometer.getY()- (3*Robot.tile));
-			this.Waypoint[1][0]=Robot.odometer.getX()-Robot.tile/2;
-			this.Waypoint[1][1]=
+			this.Waypoint[1][0]=Waypoint[0][0]-Robot.tile/2;
+			this.Waypoint[1][1]=Waypoint[0][1];
+			this.Waypoint[2][0]=Waypoint[1][0];
+			this.Waypoint[2][1]=Waypoint[1][1]+(2.5*Robot.tile);
+			this.Waypoint[3][0]=Waypoint[2][0]-Robot.tile/2;
+			this.Waypoint[3][1]=Waypoint[2][1];
+			this.Waypoint[4][0]=Waypoint[3][0];
+			this.Waypoint[4][1]=Waypoint[3][1]-(2.5*Robot.tile);
 			break;
 			
 		case 4:
 			this.Waypoint[0][0]=Robot.odometer.getX();
 			this.Waypoint[0][1]=(Robot.odometer.getY()- (3*Robot.tile));
+			this.Waypoint[1][0]=Waypoint[0][0]+Robot.tile/2;
+			this.Waypoint[1][1]=Waypoint[0][1];
+			this.Waypoint[2][0]=Waypoint[1][0];
+			this.Waypoint[2][1]=Waypoint[1][1]+(2.5*Robot.tile);
+			this.Waypoint[3][0]=Waypoint[2][0]+Robot.tile/2;
+			this.Waypoint[3][1]=Waypoint[2][1];
+			this.Waypoint[4][0]=Waypoint[3][0];
+			this.Waypoint[4][1]=Waypoint[3][1]-(2.5*Robot.tile);
 			break;		
 				
 		}
@@ -138,17 +156,17 @@ public class FlagCapture {
 		 * 
 		 * 
 		 */
-		 
+		setCorner();
+		getWaypoints();
+		
 		while(!isCaptured){
 			
 			while(!atWaypoint(x))	{
 					forward();
 					while(!isObstacle());
 					Investigate();				
-			}					
-										
-		}
-			
+			}															
+		}			
 	}		
 				
 	private boolean isObstacle() {
@@ -160,18 +178,40 @@ public class FlagCapture {
 			return false;
 	}
 	
-	/*
-	 * add corner in even odd check
-	 */
+	
 	
 	private boolean atWaypoint(int x){
+		
 		double deltaX= Waypoint[x][0]-Robot.odometer.getX();
 		double deltaY= Waypoint[x][1]-Robot.odometer.getY();
+		
 		if(Math.abs(deltaX)<dist_error && Math.abs(deltaY)<dist_error){
 			this.x++;
-			if(x%2==0){
-				changeDirection(Cardinal_Dir.EAST);
-			
+			if(!(x%2==0)){
+				 if (search_corner==1 || search_corner==4){
+					 changeDirection(Cardinal_Dir.EAST);		
+				 }
+				 else if(search_corner==2|| search_corner==3){
+					 changeDirection(Cardinal_Dir.WEST);
+				 }
+			}
+			else{
+				if(x==2){
+					if(search_corner==1 || search_corner==2){
+						changeDirection(Cardinal_Dir.SOUTH);		
+					}
+					else{
+						changeDirection(Cardinal_Dir.NORTH);
+					}
+				}
+				else if(x==4){
+					if(search_corner==1 || search_corner==2){
+						changeDirection(Cardinal_Dir.NORTH);		
+					}
+					else{
+						changeDirection(Cardinal_Dir.SOUTH);		
+					}					
+				}
 			}
 			return true;
 		}
@@ -194,10 +234,8 @@ public class FlagCapture {
 		if(Robot.colorPoller.getColor() == (Robot.Opp_Color)){
 			captureFlag();					
 		}
-		else{
-			
-				GetOutTheWay();		
-				
+		else{		
+				GetOutTheWay();						
 			}
 	 }
 		
