@@ -30,18 +30,22 @@ public class FlagCapture {
 	public static final EV3MediumRegulatedMotor grabberMotor = new EV3MediumRegulatedMotor(LocalEV3.get().getPort("B")); 
 	//private int now_armTacho, last_armTacho; 
 	private int ARM_SPEED = 80, GRAB_SPEED = 120;
-	//angle in radians toward which to turn to throw non flags
-	private double PHI ; 
+	
+//	//angle in radians toward which to turn to throw non flags
+//	private double PHI ; 
+	
 	//entry tile in search routine
 	private double [] search_start;
 	//search routine start corner
 	private int search_corner=0;
 	// outer index of 2D Waypoint array
-	private int x=0;
+	private int waypoint=0;
 	//tolerated distance error from  waypoint
 	private double dist_error= 1.5;
 	//Waypoint array
 	private double [][] Waypoint= new double[5][2];
+	//has the waypoint been reached
+	private boolean atWaypoint=false;
 	
 	public enum Cardinal_Dir {
 		EAST, NORTH, WEST, SOUTH
@@ -161,10 +165,16 @@ public class FlagCapture {
 		
 		while(!isCaptured){
 			
-			while(!atWaypoint(x))	{
+			while(!atWaypoint)	{
 					forward();
-					while(!isObstacle());
-					Investigate();				
+					while(!(isObstacle() || atWaypoint()));
+					if(!atWaypoint()){
+						Investigate();	
+						nextWaypoint(waypoint);
+					}
+					else if(atWaypoint()){
+						nextWaypoint(waypoint);
+					}
 			}															
 		}			
 	}		
@@ -180,23 +190,33 @@ public class FlagCapture {
 	
 	
 	
-	private boolean atWaypoint(int x){
-		
-		double deltaX= Waypoint[x][0]-Robot.odometer.getX();
-		double deltaY= Waypoint[x][1]-Robot.odometer.getY();
-		
+	private boolean atWaypoint() {
+
+		double deltaX= Waypoint[waypoint][0]-Robot.odometer.getX();
+		double deltaY= Waypoint[waypoint][1]-Robot.odometer.getY();
 		if(Math.abs(deltaX)<dist_error && Math.abs(deltaY)<dist_error){
-			this.x++;
-			if(!(x%2==0)){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	
+		
+	private void nextWaypoint(int waypoint){
+				
+		if(atWaypoint()){
+			this.waypoint++;
+			if(!(waypoint%2==0)){
 				 if (search_corner==1 || search_corner==4){
 					 changeDirection(Cardinal_Dir.EAST);		
 				 }
 				 else if(search_corner==2|| search_corner==3){
 					 changeDirection(Cardinal_Dir.WEST);
 				 }
-			}
+			}		
 			else{
-				if(x==2){
+				if(waypoint==2){
 					if(search_corner==1 || search_corner==2){
 						changeDirection(Cardinal_Dir.SOUTH);		
 					}
@@ -204,7 +224,7 @@ public class FlagCapture {
 						changeDirection(Cardinal_Dir.NORTH);
 					}
 				}
-				else if(x==4){
+				else if(waypoint==4){
 					if(search_corner==1 || search_corner==2){
 						changeDirection(Cardinal_Dir.NORTH);		
 					}
@@ -213,11 +233,12 @@ public class FlagCapture {
 					}					
 				}
 			}
-			return true;
+			this.atWaypoint=true;
 		}
-		else
-			return false;
 		
+		else{
+			this.atWaypoint=false;
+		}
 	}
 	
 	
@@ -235,8 +256,10 @@ public class FlagCapture {
 			captureFlag();					
 		}
 		else{		
-				GetOutTheWay();						
-			}
+			double current_heading= Robot.odometer.getTheta();
+			GetOutTheWay();	
+			Robot.navigator.turnTo(current_heading);
+		}
 	 }
 		
 	
@@ -257,7 +280,12 @@ public class FlagCapture {
 	
 	public void GetOutTheWay() throws InterruptedException {
 		captureFlag(); 
-		Robot.navigator.turnTo(PHI ); 
+		if(search_corner==1 || search_corner==4){
+			changeDirection(Cardinal_Dir.WEST);
+		}
+		else{
+			changeDirection(Cardinal_Dir.EAST);
+		}
 		armMotor.rotate(120);
 		grabberMotor.flt();
 		armMotor.rotate(-120);
