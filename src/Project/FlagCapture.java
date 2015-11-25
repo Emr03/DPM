@@ -34,10 +34,18 @@ public class FlagCapture {
 	private double PHI ; 
 	//entry tile in search routine
 	private double [] search_start;
+	//search routine start corner
+	private int search_corner=0;
 	// outer index of 2D Waypoint array
 	private int x=0;
 	//tolerated distance error from  waypoint
 	private double dist_error= 1.5;
+	//Waypoint array
+	private double [][] Waypoint= new double[5][2];
+	
+	public enum Cardinal_Dir {
+		EAST, NORTH, WEST, SOUTH
+	};
 	
 	
 	
@@ -57,15 +65,62 @@ public class FlagCapture {
 		this.usPoller_left = Robot.usPoller_left; 
 	}
 	
+	
+	/*
+	 * finish populating waypts
+	 */
 	double[][] getWaypoints(){
 		
 		//An array of each waypoint and its x&y position
-		double [][] Waypoint= new double[5][2];
+		double top= (Robot.MyHome_upperRight[1])*Robot.tile + Robot.tile/2;
 		
-		if(search_start)
+		if(search_start[0]==Robot.MyHome_lowerLeft[0]){			
+			
+			if(search_start[1]==top){
+				search_corner=4;				
+			}
+			search_corner=1;
+		}
+		else if(search_start[0]==Robot.MyHome_upperRight[0]){
+			if(search_start[1]==top){
+				search_corner=3;
+			}
+			search_corner=2;
+		}
 		
+		switch(search_corner){
+		case 1:
+			this.Waypoint[0][0]=Robot.odometer.getX();
+			this.Waypoint[0][1]=(Robot.odometer.getY()+ (3*Robot.tile));
+			this.Waypoint[1][0]=Robot.odometer.getX()+Robot.tile/2;
+			this.Waypoint[1][0]=Robot.odometer.getY();
+			this.Waypoint[2][0]=Robot.odometer.getX();
+			this.Waypoint[2][1]=(Robot.odometer.getY()- (2.5*Robot.tile));
+			this.Waypoint[3][0]=Robot.odometer.getX()+Robot.tile/2;
+			this.Waypoint[3][1]=Robot.odometer.getY();
+			this.Waypoint[4][0]=Robot.odometer.getX();
+			this.Waypoint[4][1]=(Robot.odometer.getY()+ (2.5*Robot.tile));
+			break;
+		case 2:
+			this.Waypoint[0][0]=Robot.odometer.getX();
+			this.Waypoint[0][1]=(Robot.odometer.getY()+ (3*Robot.tile));
+			
+			break;
+		case 3:
+			this.Waypoint[0][0]=Robot.odometer.getX();
+			this.Waypoint[0][1]=(Robot.odometer.getY()- (3*Robot.tile));
+			this.Waypoint[1][0]=Robot.odometer.getX()-Robot.tile/2;
+			this.Waypoint[1][1]=
+			break;
+			
+		case 4:
+			this.Waypoint[0][0]=Robot.odometer.getX();
+			this.Waypoint[0][1]=(Robot.odometer.getY()- (3*Robot.tile));
+			break;		
+				
+		}
 		
-		
+		return this.Waypoint;
 	}
 	/**
 	 * This method searches for the Flag
@@ -105,14 +160,18 @@ public class FlagCapture {
 			return false;
 	}
 	
+	/*
+	 * add corner in even odd check
+	 */
+	
 	private boolean atWaypoint(int x){
 		double deltaX= Waypoint[x][0]-Robot.odometer.getX();
 		double deltaY= Waypoint[x][1]-Robot.odometer.getY();
 		if(Math.abs(deltaX)<dist_error && Math.abs(deltaY)<dist_error){
 			this.x++;
 			if(x%2==0){
-				
-				
+				changeDirection(Cardinal_Dir.EAST);
+			
 			}
 			return true;
 		}
@@ -126,6 +185,7 @@ public class FlagCapture {
 	 * Notes on investigate: 
 	 * 
 	 * what to do if it is the wrong flag: throw it West or east depending
+	 * 
 	 */
 	 public void Investigate() throws InterruptedException{
 		
@@ -135,19 +195,12 @@ public class FlagCapture {
 			captureFlag();					
 		}
 		else{
-			if(mainPath){
+			
 				GetOutTheWay();		
-				mainPath=false;
-				}
-				else{
-					Robot.navigator.turnTo(180);
-					forward(15);
-				}
+				
 			}
 	 }
-	
-
-	
+		
 	
 	/**
 	 * This method captures the Flag once found
@@ -182,7 +235,27 @@ public class FlagCapture {
 		Robot.rightMotor.forward();
 		
 	}
-
+	
+	private void changeDirection(Cardinal_Dir direction) {
+		double theta;
+		switch (direction) {
+		case NORTH:
+			theta = Math.PI / 2;
+			break;
+		case SOUTH:
+			theta = 3 * Math.PI / 2;
+			break;
+		case WEST:
+			theta = Math.PI;
+			break;
+		case EAST:
+			theta = 0;
+			break;
+		default:
+			return;
+		}
+		Robot.navigator.turnTo(theta);
+	}
 	
 //	public  int convertDistance(double radius, double distance) {
 //		return (int) ((180.0 * distance) / (Math.PI * radius));
