@@ -51,6 +51,7 @@ public class Robot {
 	public static int Opp_Color=0;
 	public static int Home_Color=0;
 	static int start_coord[] = {0,0};
+	public static boolean search_ON=false;
 	
 	
 	
@@ -110,6 +111,7 @@ public class Robot {
 		planner.setDestination(entry_points); 
 		planner.travel(); 
 		
+		//set search_ON to true before calling Flag Capture
 		/*FlagCapture IwannaWin = new FlagCapture(Opp_Color,entry_points); 
 		try {
 			IwannaWin.Search();

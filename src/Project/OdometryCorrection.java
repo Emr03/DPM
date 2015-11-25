@@ -32,7 +32,7 @@ public class OdometryCorrection extends Thread {
 
 		double[] current_pos = new double[3];
 
-		while (true) {
+		while (!(Robot.search_ON)) {
 			correctionStart = System.currentTimeMillis();
 
 			Robot.lightSensor.getRedMode().fetchSample(lsData, 0);

@@ -20,7 +20,7 @@ import lejos.hardware.motor.EV3MediumRegulatedMotor;
 public class FlagCapture {
 	
 	private float flagColor;
-	private boolean isCaptured;
+	public boolean isCaptured;
 	private int maxDist=15;
 	private boolean mainPath= true;
 	private UltrasonicPoller usPoller_left;
@@ -31,9 +31,10 @@ public class FlagCapture {
 	//private int now_armTacho, last_armTacho; 
 	private int ARM_SPEED = 80, GRAB_SPEED = 120;
 	
-//	//angle in radians toward which to turn to throw non flags
-//	private double PHI ; 
-	
+	//speed to approach flags
+	private int FLAG_SPEED=50;
+	//current heading of the robot
+	private double[] current_position;
 	//entry tile in search routine
 	private double [] search_start;
 	//search routine start corner
@@ -88,6 +89,7 @@ public class FlagCapture {
 			search_corner=2;
 		}
 	}	
+	
 	private double[][] getWaypoints(){
 		switch(search_corner){
 		case 1:
@@ -152,13 +154,7 @@ public class FlagCapture {
 	public void Search() throws InterruptedException{
 	
 		/*
-		 * Remember to add a boolean to the odomertry correction thread and set it false here
-		 * 
-		 * Need to find a better way of returning to the initial pos on the Main search branch
-		 * 
-		 * may need to change the max dist for the check from the center line
-		 * 
-		 * 
+		 * Remember to add a boolean to the odometry correction thread and set it false here
 		 */
 		setCorner();
 		getWaypoints();
@@ -166,9 +162,10 @@ public class FlagCapture {
 		while(!isCaptured){
 			
 			while(!atWaypoint)	{
-					forward();
+					forward(1);
 					while(!(isObstacle() || atWaypoint()));
 					if(!atWaypoint()){
+						Robot.odometer.getPosition(current_position);
 						Investigate();	
 						nextWaypoint(waypoint);
 					}
@@ -180,16 +177,14 @@ public class FlagCapture {
 	}		
 				
 	private boolean isObstacle() {
-		if ((Robot.usPoller_left.getDistance() < 10 ||  Robot.usPoller_right.getDistance() < 10)) {
+		if ((usPoller_left.getDistance() < 10 || usPoller_right.getDistance() < 10)) {
 			return true;
 		}
 
 		else
 			return false;
-	}
-	
-	
-	
+	}	
+		
 	private boolean atWaypoint() {
 
 		double deltaX= Waypoint[waypoint][0]-Robot.odometer.getX();
@@ -200,8 +195,7 @@ public class FlagCapture {
 		else{
 			return false;
 		}
-	}
-	
+	}	
 		
 	private void nextWaypoint(int waypoint){
 				
@@ -241,24 +235,51 @@ public class FlagCapture {
 		}
 	}
 	
-	
-	/*
-	 * Notes on investigate: 
-	 * 
-	 * what to do if it is the wrong flag: throw it West or east depending
-	 * 
-	 */
-	 public void Investigate() throws InterruptedException{
+	private void travelToFlag(){
 		
-		forward();
+		double current_heading= current_position[2];
+		
+		if(Robot.localizer.getFilteredData(usPoller_left)>=Robot.localizer.getFilteredData(usPoller_right)){
+			if((current_heading-3 * Math.PI / 2)<=0.087){
+				Robot.navigator.turnTo(Math.PI);
+				while(!(Robot.localizer.getFilteredData(usPoller_left)==Robot.localizer.getFilteredData(usPoller_right)));
+				Robot.navigator.stopMotors();
+			}
+			else{
+				Robot.navigator.turnTo(0);
+				while(!(Robot.localizer.getFilteredData(usPoller_left)==Robot.localizer.getFilteredData(usPoller_right)));
+				Robot.navigator.stopMotors();			
+			}
+		}
+		else{
+			if((current_heading-3 * Math.PI / 2)<=0.087){
+				Robot.navigator.turnTo(0);
+				while(!(Robot.localizer.getFilteredData(usPoller_left)==Robot.localizer.getFilteredData(usPoller_right)));
+				Robot.navigator.stopMotors();
+			}
+			else{
+				Robot.navigator.turnTo(Math.PI);
+				while(!(Robot.localizer.getFilteredData(usPoller_left)==Robot.localizer.getFilteredData(usPoller_right)));
+				Robot.navigator.stopMotors();
+			}
+		}
+	}
+
+	
+	
+	 private void Investigate() throws InterruptedException{
+		
+		travelToFlag();
+		forward(2);
 		while(Robot.colorPoller.getColor()>=14);
 		if(Robot.colorPoller.getColor() == (Robot.Opp_Color)){
 			captureFlag();					
 		}
-		else{		
-			double current_heading= Robot.odometer.getTheta();
+		else{
+			Robot.navigator.travelTo(current_position[0],current_position[1]);
+			Robot.navigator.turnTo(current_position[2]);
 			GetOutTheWay();	
-			Robot.navigator.turnTo(current_heading);
+			
 		}
 	 }
 		
@@ -268,7 +289,7 @@ public class FlagCapture {
 	 * @return isCaptured Boolean that is true when Flag has been captured.
 	 * @throws InterruptedException 
 	 */
-	public void captureFlag() throws InterruptedException{
+	private void captureFlag() throws InterruptedException{
 		//if setAcceleration is not smooth enough, P-control of arm speed goes here (uses tachocounts)
 		//rotate forward 120 degrees?
 		armMotor.rotate(120); 
@@ -278,7 +299,7 @@ public class FlagCapture {
 		this.isCaptured=true;
 	}
 	
-	public void GetOutTheWay() throws InterruptedException {
+	private void GetOutTheWay() throws InterruptedException {
 		captureFlag(); 
 		if(search_corner==1 || search_corner==4){
 			changeDirection(Cardinal_Dir.WEST);
@@ -292,14 +313,22 @@ public class FlagCapture {
 	}
 	
 
-	private void forward(){
+	private void forward(int speed){
 		
+		if(speed==1){
 		Robot.leftMotor.setSpeed(Robot.FORWARD_SPEED);
 		Robot.rightMotor.setSpeed(Robot.FORWARD_SPEED);
 		
 		Robot.leftMotor.forward();
 		Robot.rightMotor.forward();
-		
+		}
+		else{
+			Robot.leftMotor.setSpeed(FLAG_SPEED);
+			Robot.rightMotor.setSpeed(FLAG_SPEED);
+			
+			Robot.leftMotor.forward();
+			Robot.rightMotor.forward();
+		}
 	}
 	
 	private void changeDirection(Cardinal_Dir direction) {
