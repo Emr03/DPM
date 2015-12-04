@@ -1,19 +1,26 @@
-package Project;
+package Project; 
 
-import Project.PathPlanner.HEADING;
+import lejos.hardware.Sound;
 
 /**
  * 
   * @author DPM TEAM18
- *@version 1.0, 7 Nov 2015
+ *@version 2.0, 25 Nov 2015
  * implements odometry correction by detecting grid lines
  */
 
 public class OdometryCorrection extends Thread {
 	private static final long CORRECTION_PERIOD = 10;
+	private double Line = 30;				// establishes the threshold of the sensor to delineate what values indicate crossing a line.
+	private double deltaX, deltaY;
+	private double Sensor_Dist = 13;				// establishes the distance of the sensor from the midpoint of the wheel axis.
+	private int distLine = 15;
 	
-	//private static final double d = 1.5; 
-	private static final double detection_ratio = 0.85;
+	
+	private static final double d = 13.0; 
+	private static final double detection_ratio = 0.9;
+
+	private boolean enabled = true;
 
 	/**
 	 * detects grid lines and updates the odometer's appropriate coordinate
@@ -22,48 +29,34 @@ public class OdometryCorrection extends Thread {
 		float last_reading;
 		float now_reading;
 		long correctionStart, correctionEnd;
-
 		double new_position;
+		float[] lightData = {0};
 
-		float[] lsData = { 0 };
-
-		Robot.lightSensor.getRedMode().fetchSample(lsData, 0);
-		last_reading = lsData[0];
-
+		Robot.lightSensor.getRedMode().fetchSample(lightData, 0);
+		last_reading = lightData[0];
 		double[] current_pos = new double[3];
 
-		while (!(Robot.search_ON)) {
+		while (enabled) {
 			correctionStart = System.currentTimeMillis();
 
-			Robot.lightSensor.getRedMode().fetchSample(lsData, 0);
-			now_reading = lsData[0];
+			Robot.lightSensor.getRedMode().fetchSample(lightData, 0);
+			now_reading = lightData[0];
 			
 			Robot.odometer.getPosition(current_pos);
-			HEADING heading = Robot.planner.getHeading();
+			PathPlanner.HEADING heading = Robot.planner.getHeading();
 
-			if (now_reading <= detection_ratio  * last_reading) {
-				switch (heading) {
-
-				case NORTH:
-					new_position = (2 * Math.floor((current_pos[1]) / 30.48)) * 15.24;
-					Robot.odometer.setY(new_position);
-					break;
-
-				case EAST:
-					new_position = (2 * Math.floor((current_pos[0]) / 30.48)) * 15.24;
-					Robot.odometer.setX(new_position);
-					break;
-
-				case SOUTH:
-					new_position = (2 * Math.floor((current_pos[1]) / 30.48)) * 15.24;
-					Robot.odometer.setY(new_position);
-					break;
-
-				case WEST:
-					new_position = (2 * Math.floor((current_pos[0]) / 30.48)) * 15.24;
-					Robot.odometer.setX(new_position);
-					break;
+			if (now_reading < detection_ratio *last_reading) {
+				Sound.beep(); 
+				deltaX = distLine - ((Robot.odometer.getX()-Sensor_Dist*Math.sin(Math.toRadians(Robot.odometer.getTheta()))))%Line;
+				deltaY = distLine - ((Robot.odometer.getY()-Sensor_Dist*Math.cos(Math.toRadians(Robot.odometer.getTheta()))))%Line;
+				
+				
+				if (Math.abs(deltaX) < Math.abs(deltaY)) {
+					Robot.odometer.setX(Robot.odometer.getX() + deltaX);
+				} else {
+					Robot.odometer.setY(Robot.odometer.getY() + deltaY);
 				}
+				
 
 			}
 
@@ -79,6 +72,11 @@ public class OdometryCorrection extends Thread {
 				}
 			}
 		}
+	}
+
+	public void disable() {
+		// TODO Auto-generated method stub
+		enabled = false; 
 	}
 
 	/*

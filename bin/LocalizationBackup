@@ -1,0 +1,273 @@
+package Project;
+
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+
+import Project.Odometer;
+import Project.UltrasonicPoller;
+import lejos.hardware.Sound;
+
+/**
+ * Localization CLass
+ * 
+ * This class is called to localize the robot on a grid.
+ * 
+ * 
+ * @author DPM TEAM18
+ * @version 1.0, 7 Nov 2015
+ * 
+ */
+
+public class Localization {
+	public static int ROTATION_SPEED = 100;
+
+	public enum LocalizationType {
+		FACING_AWAY, FACING_WALL
+	};
+
+	private Odometer odo;
+	private int corner = 0;
+	//private UltrasonicPoller usPoller_left;
+	private UltrasonicPoller usPoller_right;
+
+	private LocalizationType locType;
+	private final int maxDist = 50;
+	private final int d = 24;
+	private final int k = 2;
+	private final double offset = 0; 
+
+	/**
+	 * Creates an Object of type Localization
+	 * 
+	 * @param odo
+	 *            Odometer
+	 * @param usPoller_left
+	 *            UltrasonicPoller
+	 * @param usPoller_right
+	 *            UltrasonicPoller
+	 * @param corner
+	 *            int
+	 */
+
+	public Localization() {
+		this.odo = Robot.odometer;
+		this.corner = Robot.start_corner;
+		this.usPoller_right = Robot.usPoller_right;
+	}
+
+	public void begin() {
+
+		// if facing the wall 
+		if (getFilteredData(usPoller_right) < d) {
+			locType = LocalizationType.FACING_WALL;
+			try {
+				doLocalization();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else {
+			locType = LocalizationType.FACING_AWAY;
+			try {
+				doLocalization();
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	/**
+	 * Localizes the Robot using Rising edge and falling edge
+	 * @throws UnsupportedEncodingException 
+	 * @throws FileNotFoundException 
+	 */
+
+	public void doLocalization() throws FileNotFoundException, UnsupportedEncodingException {
+
+		PrintWriter writer = null; 
+		writer = new PrintWriter(String.format("data%d.csv", System.currentTimeMillis()), "UTF-8"); 
+		
+		if (locType == LocalizationType.FACING_WALL) {
+			// counterclockwise
+			double angleA, angleB;
+
+			// rotate the robot counterclockwise until it sees a rising edge
+			// then stop and latch
+			// rising edge
+			turn(false);
+			while (getFilteredData(usPoller_right) <= d + k );
+			halt();
+			angleA = odo.getTheta();
+			writer.write(angleA + " , " + getFilteredData(usPoller_right) + "\n");
+			writer.flush(); 
+			Sound.twoBeeps();
+
+			
+			// turn until it sees a wall then stop and latch
+			// falling edge
+			turn(false);
+			while (getFilteredData(usPoller_right) > d - k );
+			halt();
+			angleB = odo.getTheta();
+			writer.write(angleB + " , " + getFilteredData(usPoller_right) + "\n");
+			writer.flush(); 
+			Sound.twoBeeps();
+
+			computeAngle(angleA, angleB);
+
+		}
+
+		// if robot is initially facing away from the wall
+		else {
+			// clockwise
+			double angleA, angleB;
+
+			// rotate the robot clockwise until it sees wall then stop and latch
+			// angle
+			// Falling edge
+			turn(true);
+			while (getFilteredData(usPoller_right) > d - k);
+			halt();
+			angleA = odo.getTheta();
+			writer.write(angleA+ " , " + getFilteredData(usPoller_right) + "\n");
+			writer.flush(); 
+			Sound.twoBeeps();
+
+			turn(true); 
+			while (getFilteredData(usPoller_right) <= d + k);
+			Sound.beepSequence();; 
+			while (getFilteredData(usPoller_right) > d - k); 
+			Sound.beepSequence();
+			
+			
+			// keep rotating till the wall disappears, then store the angle
+			// Rising edge
+
+			turn(true); 
+			while (getFilteredData(usPoller_right) <= d + k );
+			halt();
+			angleB = odo.getTheta();
+			writer.write(angleB + " , " + getFilteredData(usPoller_right) + "\n");
+			writer.flush(); 
+			Sound.twoBeeps();
+
+			computeAngle(angleA, angleB);
+
+		}
+
+	}
+	
+
+	/**
+	 * This method returns filtered data on the distances recored by the US
+	 * Poller Class.
+	 * 
+	 * @param usPoller
+	 *            UltrasonicPoller
+	 * @return distance int
+	 */
+	private int getFilteredData(UltrasonicPoller usPoller) {
+
+		int distance = usPoller.getDistance();
+		if (distance > maxDist) {
+			distance = maxDist;
+		}
+
+		return distance;
+	}
+	
+
+
+	private void computeAngle(double angleA, double angleB) {
+
+		double deltaTheta = 0;
+		deltaTheta = computeDeltaTheta(angleA, angleB);
+		switch (this.corner) {
+
+		// Corner 1
+		case 1:
+			odo.setPosition(new double[] { 0.0, 0.0, odo.getTheta() + deltaTheta },
+					new boolean[] { false, false, true });
+			break;
+
+		// depends if started facing or away
+		// -90
+		case 2:
+			odo.setPosition(new double[] { 0.0, 0.0, odo.getTheta() + deltaTheta + Math.PI/2 },
+					new boolean[] { false, false, true });
+			break;
+
+		// Corner 3, same as 1 but minus 180
+		case 3:
+			odo.setPosition(new double[] { 0.0, 0.0, odo.getTheta() + deltaTheta + Math.PI },
+					new boolean[] { false, false, true });
+			break;
+
+		// Corner 4 same as case 2 but minus 180
+		// +90
+		case 4:
+
+			odo.setPosition(new double[] { 0.0, 0.0, odo.getTheta() + deltaTheta - Math.PI/2 },
+					new boolean[] { false, false, true });
+			break;
+
+		}
+		Robot.navigator.turnTo(0); 
+	}
+
+	private double computeDeltaTheta(double angleA, double angleB) {
+
+		double deltaTheta;
+//		if (this.locType == LocalizationType.FACING_AWAY){
+//			deltaTheta = Math.PI/4 - (angleA + angleB) / 2;
+//		}
+		
+		if (angleA > angleB) {
+			deltaTheta = 5*Math.PI/4 - (angleA + angleB) / 2;
+	} 
+		
+		else {
+			deltaTheta = Math.PI/4 - (angleA + angleB) / 2;
+		}
+
+		return deltaTheta + offset;
+
+	}
+
+	// turns the robot in a circle until stopped
+	/**
+	 * turns the robot clockwise if the boolean parameter is true,
+	 * counterclockwise if false
+	 * 
+	 * @param clockwise
+	 */
+	public void turn(boolean clockwise) {
+
+		Robot.leftMotor.setSpeed(ROTATION_SPEED);
+		Robot.rightMotor.setSpeed(ROTATION_SPEED);
+
+		if (clockwise) {
+			Robot.leftMotor.forward();
+			Robot.rightMotor.backward();
+		} else {
+			Robot.leftMotor.backward();
+			Robot.rightMotor.forward();
+		}
+
+	}
+
+	public void halt() {
+		Robot.leftMotor.stop();
+		Robot.rightMotor.stop();
+	}
+
+}

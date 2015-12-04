@@ -6,17 +6,12 @@ import lejos.robotics.SampleProvider;
 /**
  * ColorSensorPoller Class
  * This class polls the ColorSensor sensor for colorIDs.
- * This class is implemented as a thread.
- * 
  * 
  * @author DPM TEAM18
- * @version 1.0, 7 Nov 2015
+ * @version 2.0, 25 Nov 2015
  * 
  *
  */
-
-
-
 
 public class ColorSensorPoller extends Thread{
 
@@ -28,18 +23,17 @@ public class ColorSensorPoller extends Thread{
 	
 	/**
 	 * Creates an Object of type ColorSensorPoller
-	 * The constructor populates a SampleProvider and an array floats with ColorID data
+	 * The constructor populates a SampleProvider and an array with ColorID data
 	 * @param colorsensor is an EV3ColorSensor
 	 */
 	public ColorSensorPoller(EV3ColorSensor colorsensor) {
 		this.colorValue=colorsensor.getMode("ColorID");
 		this.colorData = new float[colorValue.sampleSize()];
-		
 	}
 	
 	
 	/**
-	 * This method is called when the thread is started 
+	 * called when the thread is started 
 	 * It acquires data from the sensor.
 	 */
 	public void run(){
@@ -56,7 +50,7 @@ public class ColorSensorPoller extends Thread{
 	}
 	
 	/**
-	 * This method returns the ColorID 
+	 * returns the ColorID 
 	 * @return float
 	 */
 	

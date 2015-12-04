@@ -5,6 +5,11 @@ import lejos.hardware.lcd.TextLCD;
 import lejos.utility.Timer;
 import lejos.utility.TimerListener;
 
+/**
+ * 
+ * @author DPM TEAM 18
+ * @version 2.0, 25 Nov 2015
+ */
 public class LCDInfo implements TimerListener {
 	public static final int LCD_REFRESH = 100;
 	private Odometer odo;
@@ -14,6 +19,7 @@ public class LCDInfo implements TimerListener {
 	// arrays for displaying data
 	private double[] pos;
 
+	
 	public LCDInfo(Odometer odo) {
 		this.odo = odo;
 		this.lcdTimer = new Timer(LCD_REFRESH, this);
@@ -25,6 +31,9 @@ public class LCDInfo implements TimerListener {
 		lcdTimer.start();
 	}
 
+	/**
+	 * Prints odometry information on the EV3 Screen
+	 */
 	public void timedOut() {
 		odo.getPosition(pos);
 		LCD.clear();
@@ -34,6 +43,5 @@ public class LCDInfo implements TimerListener {
 		LCD.drawInt((int) (pos[0]*10), 3, 0);
 		LCD.drawInt((int) (pos[1]*10), 3, 1);
 		LCD.drawInt((int) Math.toDegrees(pos[2]), 3, 2);
-		LCD.drawInt((int) Robot.usPoller_left.getDistance(), 3, 3);
 	}
 }

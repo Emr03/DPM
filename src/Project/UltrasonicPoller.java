@@ -1,5 +1,5 @@
-package Project;
 
+package Project; 
 
 
 import lejos.robotics.SampleProvider;
@@ -21,10 +21,10 @@ public class UltrasonicPoller extends Thread {
 	
 	private SampleProvider us;
 	private float[] usData;
-	public int distance;
+	public int distance = 50;
 	private Object lock = new Object();
 	private int filterControl = 0;
-	private int FILTER_OUT = 2;
+	private int FILTER_OUT = 10;
 	
 
 	/**
@@ -48,7 +48,6 @@ public class UltrasonicPoller extends Thread {
 	 * 
 	 */
 	
-	
 	public void run() {
 		int d; 
 		while (true) {
@@ -66,8 +65,8 @@ public class UltrasonicPoller extends Thread {
 
 	
 	/**
-	 * This method updates the distances recognized by the UltraSonic sensor.
-	 * @return int assigned the value of the distance seen by the US sensor.
+	 * returns filtered distance measured by ultrasonic sensor 
+	 * @return the distance in cm seen by the US sensor.
 	 */
 	public int getDistance() {
 		int result = this.distance; 
@@ -76,6 +75,11 @@ public class UltrasonicPoller extends Thread {
 		}
 	}
 	
+	/**
+	 * filters spurious infinity values reported by the ultrasonic sensor
+	 * @param d the unfiltered distance measured by the ultrasonic sensor
+	 * @return the last distance reading before spurious infinity values
+	 */
 	public int getFilteredData(int d) {
 		// use filter control!!
 		if(d >= 100 && filterControl < FILTER_OUT) {
@@ -87,7 +91,7 @@ public class UltrasonicPoller extends Thread {
 			this.distance = d;
 		}
 		
-		// distance went below 70, therefore reset everything.
+		// distance went below 100, therefore reset everything.
 		else{
 			filterControl = 0;
 			this.distance = d;
